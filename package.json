@@ -1,0 +1,21 @@
+{
+  "name": "paikkari-hisab-android",
+  "version": "1.0.0",
+  "description": "Paikkari Hisab - Android native app wrapper",
+  "scripts": {
+    "sync": "npx cap sync android",
+    "open": "npx cap open android",
+    "build": "npx cap sync android && cd android && ./gradlew assembleDebug",
+    "build:release": "npx cap sync android && cd android && ./gradlew bundleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/app": "^6.0.1",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/splash-screen": "^6.0.2",
+    "@capacitor/status-bar": "^6.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2"
+  }
+}
