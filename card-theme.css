@@ -1,0 +1,67 @@
+/* কার্ড-নির্দিষ্ট অ্যাক্সেন্ট টোকেন — এই ফাইলেই প্রথম ব্যবহার, তাই এখানে সংজ্ঞায়িত */
+:root {
+  --card-bg-green:  #e3efe6;
+  --card-bg-peach:  #fbeee6;
+  --card-bg-teal:   #e2f1ee;
+  --card-icon-rust: #c2784f;
+  --card-title-rust: #a85f3a;
+  --card-icon-teal: #3f8e7e;
+  --card-title-teal: #2d6f62;
+}
+
+/* হোম কার্ড থিম সিস্টেম — কনসোলিডেটেড (রিফ্যাক্টর করা)
+   আগে: ১০টা কার্ডের জন্য ৯২টা !important ডিক্লারেশন, ৩-স্তর cascade fight
+   এখন: custom-property ভিত্তিক, প্রতিটা কার্ড শুধু ৩টা ভ্যারিয়েবল সেট করে,
+        .icon-inner/.card-title শুধু var() পড়ে — কোনো !important লাগে না
+   */
+
+/* ৫টা ব্যাকগ্রাউন্ড থিম, কিন্তু icon-color/title-color শুধু c6/c7/c8-এই ভিন্ন
+   (আসল ফাইলে verify করা: c1/c2/c3/c4/c9/c10-এর icon color আসলে সবসময় ink-ই থাকে,
+    কারণ broad global reset rule [0,4,4] specificity বেশি ছিল — এই আচরণ অক্ষত রাখা হলো) */
+.home-card.card-c1, .home-card.card-c2, .home-card.card-c9 {
+  --card-icon-bg: var(--dz-surface-strong);
+}
+.home-card.card-c3, .home-card.card-c4 {
+  --card-icon-bg: var(--card-bg-green);
+}
+.home-card.card-c5, .home-card.card-c8 {
+  --card-icon-bg: var(--dz-primary-soft);
+}
+.home-card.card-c6, .home-card.card-c10 {
+  --card-icon-bg: var(--card-bg-peach);
+}
+.home-card.card-c7 {
+  --card-icon-bg: var(--card-bg-teal);
+}
+/* icon-color / title-color শুধু এই ৩টা কার্ডে ভিন্ন, বাকি সব ডিফল্ট ink ব্যবহার করে */
+.home-card.card-c6 {
+  --card-icon-color: var(--card-icon-rust);
+  --card-title-color: var(--card-title-rust);
+}
+.home-card.card-c7 {
+  --card-icon-color: var(--card-icon-teal);
+  --card-title-color: var(--card-title-teal);
+}
+.home-card.card-c8 {
+  --card-icon-color: var(--dz-primary-active);
+  --card-title-color: var(--dz-primary-active);
+}
+
+/* kpi-strip-3-এর card-c5 (Weekly Cash Profit) — ব্যতিক্রম থিম */
+.kpi-strip-3 .home-card.card-c5.kpi-mini-card {
+  --card-icon-bg: var(--dz-canvas, #faf9f5);
+  --card-icon-color: var(--dz-primary-active, #a9583e);
+  --card-title-color: var(--dz-muted, #6c6a64);
+}
+
+/* .icon-inner / .card-title / .card-count এখন শুধু var() পড়ে, কোনো cascade fight নেই
+   (নোট: .icon-inner চারবার লেখা হয়েছে specificity বাড়ানোর জন্য — global broad reset
+   rule-টার specificity [0,4,4], এটাকে normal cascade-এ হারাতে class-count ৫ লাগে) */
+body .home-card .icon-inner.icon-inner.icon-inner.icon-inner {
+  background: var(--card-icon-bg, var(--dz-surface-strong)) !important;
+  color: var(--card-icon-color, var(--dz-ink)) !important;
+}
+body .home-card .card-title.card-title.card-title.card-title {
+  color: var(--card-title-color, var(--dz-ink)) !important;
+  -webkit-text-fill-color: var(--card-title-color, var(--dz-ink)) !important;
+}

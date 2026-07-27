@@ -1,0 +1,264 @@
+
+:root {
+  /* পাইক্কারি ড্রয়ার-নির্দিষ্ট রং — অন্য কোথাও শেয়ার করা হয়নি বলে এখানেই সংজ্ঞায়িত */
+  --pk-drawer-bg: #1a2e20;
+  --pk-surface-white: #ffffff;
+  --pk-accent-purple: #7c3aed;
+  --pk-accent-amber: #92621a;
+  --pk-accent-teal: #1a7a6a;
+  --pk-accent-navy: #1c2660;
+  --pk-accent-navy-deep: #11163c;
+  --pk-text-muted: #a09d96;
+}
+#paikkariOverlay{
+  display:none;position:fixed;inset:0;z-index:var(--z-drawer-top);
+  background:rgba(0,0,0,0.45);
+  align-items:flex-end;justify-content:center;
+}
+#paikkariOverlay.pk-open{display:flex;}
+#pk-drawer{
+  width:100%;max-width:700px;
+  height:92dvh;
+  background:var(--pk-drawer-bg);
+  border-radius:var(--radius-6xl) var(--radius-6xl) 0 0;
+  display:flex;flex-direction:column;
+  transform:translateY(100%);
+  transition:none;
+  overflow:hidden;
+}
+#paikkariOverlay.pk-open #pk-drawer{transform:translateY(0);}
+/* drag pill */
+#pk-drawer-pill{
+  width:40px;height:4px;border-radius:var(--radius-xs);
+  background:rgba(255,255,255,0.25);
+  margin:10px auto 0;flex-shrink:0;
+}
+#pk-body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
+
+/* লাইট মোডে */
+body #pk-drawer { background:var(--dz-canvas); }
+body #pk-body { background:var(--dz-canvas); }
+body #pk-body .app-shell { background:var(--dz-canvas); }
+body #pk-body .page { background:var(--dz-canvas); }
+
+/* DESIGN.md থিম override — pk-body */
+
+/* Drawer handle + header */
+body #pk-drawer-pill { background: var(--dz-hairline, #e6dfd8); width:48px; height:5px; border-radius:3px; }
+
+/* Cards — feature-card style */
+body #pk-body .card {
+  background: var(--pk-surface-white);
+  border: 1px solid var(--dz-hairline);
+  border-radius: var(--radius-3xl);
+  margin-bottom: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(20,20,19,0.05);
+}
+body #pk-body .settings-group > .card {
+  background: var(--pk-surface-white);
+}
+
+/* Card header */
+body #pk-body .card-head {
+  background: var(--dz-surface-soft);
+  border-bottom: 1px solid var(--dz-hairline);
+  padding: 11px 16px 10px;
+}
+body #pk-body .card-title {
+  font-size: 11px; font-weight: 700;
+  color: var(--dz-muted); letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Badges */
+body #pk-body .cbadge {
+  background: var(--dz-surface-card); color: var(--dz-muted);
+  font-size: var(--font-xs); font-weight: 600;
+  border-radius: var(--radius-pill-alt); padding: 3px 9px;
+}
+body #pk-body .cbadge.purple {
+  background: rgba(139,92,246,0.08); color: var(--pk-accent-purple);
+}
+
+/* Field rows */
+body #pk-body .frow {
+  border-bottom: 1px solid var(--dz-hairline-soft);
+  min-height: 50px; padding: 0 16px;
+}
+body #pk-body .flabel {
+  font-size: 13px; font-weight: 500; color: var(--dz-body);
+}
+body #pk-body .flabel-auto { color: var(--dz-muted-soft); font-size: 12px; }
+body #pk-body .fauto {
+  font-size: 14px; font-weight: 700; color: var(--dz-primary);
+}
+
+/* Input wrap — text-input style */
+body #pk-body .finput-wrap {
+  background: var(--dz-canvas);
+  border: 1px solid var(--dz-hairline);
+  border-radius: var(--radius-lg);
+}
+body #pk-body .finput-wrap:focus-within {
+  border-color: var(--dz-primary);
+  box-shadow: 0 0 0 3px rgba(204,120,92,0.15);
+}
+body #pk-body .finput-wrap input {
+  color: var(--dz-ink); font-size: 15px; font-weight: 700;
+}
+body #pk-body .funit {
+  color: var(--dz-muted-soft); font-size: 11px;
+}
+
+/* Hint box */
+body #pk-body .hint {
+  background: rgba(232,165,90,0.07);
+  border: 1px solid rgba(232,165,90,0.25);
+  color: var(--pk-accent-amber);
+}
+
+/* Info box */
+body #pk-body .info-box {
+  background: rgba(93,184,166,0.07);
+  border: 1px solid rgba(93,184,166,0.22);
+  color: var(--pk-accent-teal);
+}
+
+body #pk-body .card-title {
+  font-size: 11px; font-weight: 700;
+  color: var(--dz-body);
+  -webkit-text-fill-color: var(--dz-body);
+  background: none;
+  background-clip: unset;
+  -webkit-background-clip: unset;
+  filter: none;
+  text-shadow: none;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+/* Primary button — navy blue */
+body #pk-body .btn-primary {
+  
+  
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: 14px; font-weight: 600;
+  padding: 10px 18px;
+  box-shadow: 0 2px 8px rgba(22,29,77,0.3);
+  letter-spacing: 0;
+}
+body #pk-body .btn-primary:active {
+  
+  
+  box-shadow: 0 1px 4px rgba(17,22,60,0.3);
+  transform: scale(0.98);
+}
+
+/* Secondary button — navy outline style */
+body #pk-body .btn-secondary {
+  background: rgba(22,29,77,0.07);
+  color: var(--pk-accent-navy);
+  border: 1px solid rgba(22,29,77,0.30);
+  border-radius: var(--radius-lg);
+  font-size: 13px; font-weight: 600;
+}
+body #pk-body .btn-secondary:active {
+  background: rgba(22,29,77,0.14);
+  color: var(--pk-accent-navy-deep);
+}
+
+/* Save button — navy solid */
+body #pk-body .btn-save {
+  
+  
+  border: 1px solid rgba(100,120,220,0.35);
+  border-radius: var(--radius-lg);
+}
+
+/* Go to calc button */
+body #pk-body .btn-go-calc {
+   
+  border: none; border-radius: var(--radius-lg);
+  padding: 10px 20px; font-weight: 500; font-size: 14px;
+  cursor: pointer;
+}
+
+/* KPI bar — dark navy surface (product-mockup-card-dark) */
+body #pk-body .kpi-bar {
+  background: var(--fab-surface-dark);
+  border-radius: var(--radius-3xl);
+  border: none;
+  padding: 12px 10px;
+  gap: 6px;
+}
+body #pk-body .kpi-card {
+  background: var(--fab-surface-dark-elev);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-2xl);
+}
+body #pk-body .kpi-label {
+  color: var(--pk-text-muted); font-size: var(--font-2xs-alt);
+}
+body #pk-body .kpi-value { font-size: 16px; }
+body #pk-body .kpi-sub { color: var(--pk-text-muted); }
+
+/* Radial progress section */
+body #pk-body .radial-wrap .radial-label {
+  color: var(--dz-muted); font-size: 11px;
+}
+
+/* Result cards grid */
+body #pk-body .rc-card {
+  background: var(--pk-surface-white);
+  border: 1.5px solid var(--dz-hairline);
+  border-radius: var(--radius-2xl);
+}
+body #pk-body .rc-card.rc-active {
+  border-color: var(--dz-primary);
+  background: rgba(204,120,92,0.05);
+}
+body #pk-body .rc-label {
+  font-size: 11px; color: var(--dz-body); font-weight: 500;
+}
+
+/* Result panels — table rows */
+body #pk-body .result-row {
+  border-bottom: 1px solid var(--dz-hairline-soft);
+}
+body #pk-body .result-row .r-label { color: var(--dz-muted); }
+body #pk-body .result-row .r-val { color: var(--dz-ink); font-weight: 700; }
+
+/* KPI level tag */
+body #pk-body .kpi-level-tag {
+  background: var(--dz-surface-card);
+  color: var(--dz-muted);
+  border-radius: var(--radius-pill-alt);
+  font-size: var(--font-xs); font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 4px 12px;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+/* Empty result state */
+body #pk-body .empty-result-title {
+  color: var(--dz-ink); font-size: 16px; font-weight: 600;
+}
+body #pk-body .empty-result-sub {
+  color: var(--dz-muted); font-size: 13px;
+}
+
+/* Drawer header title area */
+body #pk-body #pk-header-area {
+  background: var(--dz-surface-soft);
+  border-bottom: 1px solid var(--dz-hairline);
+}
+
+/* validation error */
+body #pk-body #validation-error {
+  background: rgba(198,69,69,0.07);
+  border: 1px solid rgba(198,69,69,0.2);
+  color: var(--dz-error);
+}

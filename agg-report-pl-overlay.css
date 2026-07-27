@@ -1,0 +1,64 @@
+
+/* AGGREGATE REPORT & P&L OVERLAY CSS */
+#homeScreen,
+#plTrendsOverlay {
+  --bg:       oklch(93.713% 0.007 56.375);
+  --surface:  oklch(97.78% 0.004 56.375);
+  --surface2: oklch(91% 0.01 160);
+  --border:   oklch(89.824% 0.012 56.375);
+  --border2:  oklch(93.713% 0.007 56.375);
+  --text:     oklch(27.807% 0.029 256.848);
+  --text2:    oklch(45% 0.022 256.848);
+  --text3:    oklch(65% 0.012 256.848);
+  --mono:     'IBM Plex Mono', monospace;
+  --color-success: oklch(64.8% 0.15 160);
+  --color-error:   oklch(71.76% 0.221 22.18);
+}
+#homeScreen .dash-summary,
+#plTrendsOverlay  .dash-summary  { background:transparent; overflow:hidden; }
+#homeScreen .dash-empty,
+#plTrendsOverlay  .dash-empty    {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:40px 20px; gap:10px; text-align:center;
+}
+#homeScreen .dash-empty-icon,
+#plTrendsOverlay  .dash-empty-icon { font-size:36px; opacity:0.25; }
+#homeScreen .dash-empty-text,
+#plTrendsOverlay  .dash-empty-text  { font-size:13px; color:var(--text3); line-height:1.6; }
+#homeScreen .report-table-wrap { overflow-x:auto; background:var(--surface); }
+#homeScreen .report-table { width:100%; border-collapse:collapse; font-size:11px; min-width:340px; }
+#homeScreen .report-table thead tr { background:var(--surface2); border-bottom:2px solid var(--border); }
+#homeScreen .report-table thead th {
+  padding:8px 10px; font-weight:800; font-size: var(--font-xs);
+  color:var(--dw-white-full); letter-spacing:0.06em; text-transform:uppercase;
+  text-align:right; white-space:nowrap;
+}
+#homeScreen .report-table thead th:first-child { text-align:left; }
+#homeScreen .report-table tbody tr { border-bottom:1px solid var(--border2); transition:background var(--dur-fast); }
+#homeScreen .report-table tbody tr:last-child { border-bottom:none; }
+#homeScreen .report-table tbody tr:hover { background:var(--surface2); }
+#homeScreen .report-table td {
+  padding:8px 10px; font-family:var(--mono); font-weight:700;
+  text-align:right; white-space:nowrap;
+}
+#homeScreen .report-table td:first-child {
+  text-align:left; font-family:inherit; font-weight:600;
+  font-size:11px; color:var(--text2);
+}
+#homeScreen .report-table tfoot tr { border-top:2px solid var(--border); background:var(--surface2); }
+#homeScreen .report-table tfoot td {
+  padding:8px 10px; font-weight:900; font-size:11px;
+  font-family:var(--mono); text-align:right; color:var(--text);
+}
+#homeScreen .report-table tfoot td:first-child { text-align:left; color:var(--text3); font-family:inherit; }
+#homeScreen .rt-net-pos { color:var(--color-success); }
+#homeScreen .rt-net-neg { color:var(--color-error); }
+#homeScreen .rt-gross   { color:oklch(48% 0.13 220); }
+#homeScreen .rt-in      { color:oklch(48% 0.14 200); }
+#homeScreen .rt-out     { color:oklch(50% 0.16 22);  }
+#plTrendsOverlay .rev-bar-scroll {
+  overflow-x:auto; overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:2px; scrollbar-width:thin;
+}
+

@@ -1,0 +1,46 @@
+
+    /* গ্লোবাল বাটন কালার — হেডারের গাঢ় সবুজ থিমের সাথে মিলিয়ে
+       (ডিলিট/ডেঞ্জার/বাতিল/ক্লোজ/ব্যাক বাটন এবং .btab-btn.active বাদে)
+       */
+
+    /* card-title-এর ভেতরের inline SVG আইকন সাইজিং — আগে ৯ জায়গায় একই
+       style="width:...px;height:...px;display:inline-block;vertical-align:middle;flex-shrink:0;"
+       পুনরাবৃত্তি হতো, এখন একটা শেয়ার্ড ক্লাস */
+    .card-title-icon {
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+    }
+    .card-title-icon.icon-sm {
+      width: 16px;
+      height: 16px;
+    }
+    
+    /* সব বাটনের লেখা সাদা — শুধুমাত্র সলিড/রঙিন ব্যাকগ্রাউন্ড বাটনে,
+       আইকন/ট্রান্সপারেন্ট/ইউটিলিটি বাটন (যেমন তারিখ, ব্যাক, ক্লোজ, নটিফিকেশন) বাদে */
+    /* সাপ্তাহিক হালনাগাদ/রিপোর্ট ওভারলের ক্রস (×) বাটন — হালকা ক্রিম ব্যাকগ্রাউন্ডে গাঢ় লেখা */
+    /* Result পেইজের ৪টা ট্যাব (P&L/রাজস্ব/ক্যাশফ্লো/Stock) — নিজস্ব থিম কালার বজায় থাকবে,
+       গ্লোবাল সাদা-লেখা নিয়মে চাপা পড়বে না */
+    #pk-body #page-result .rc-card {
+      color: var(--dz-muted, #6c6a64) !important;
+      -webkit-text-fill-color: var(--dz-muted, #6c6a64) !important;
+    }
+    #pk-body #page-result .rc-card.rc-active {
+      color: var(--dz-primary-active, #a9583e) !important;
+      -webkit-text-fill-color: var(--dz-primary-active, #a9583e);
+    }
+    
+    
+    /* গাঢ় সবুজ বাটন */
+    
+    
+    
+    .tbl-edit-mode-btn.active {
+      background: rgba(10,69,72,.14) !important;
+      border-color: rgba(10,69,72,.45) !important;
+    }
+    /* ডিলিট মুড চালু থাকা অবস্থায় লালই থাকবে (JS দিয়ে override করা হয়) */
+    
+  

@@ -1,0 +1,322 @@
+/* ============================================================
+   _tokens.css — CENTRAL DESIGN TOKENS (radius, motion, z-index)
+   ------------------------------------------------------------
+   Color tokens are NOT here — this app has 3 separate,
+   intentionally different color systems (see theme-dark-wood.css
+   --dz-*/--fab-*, theme-cupcake.css oklch set, agg-report-pl-overlay.css
+   oklch set). Each keeps its own :root block. This file only
+   covers the truly global, cross-cutting scales.
+
+   Load this FIRST, before any other stylesheet.
+   ============================================================ */
+
+:root {
+  /* ---- Radius scale ----
+     Derived from the actual distribution of border-radius values
+     found across the codebase (7px–20px cluster = UI chrome,
+     50%/9999px = pills/circles). Values preserved exactly;
+     nothing renamed or rounded. */
+  --radius-xs:   2px;
+  --radius-sm:   4px;
+  --radius-base: 6px;
+  --radius-md:   7px;
+  --radius-lg:   8px;
+  --radius-xl:   9px;
+  --radius-2xl:  10px;
+  --radius-3xl:  12px;
+  --radius-2xs:  5px;
+  --radius-4xl:  14px;
+  --radius-4xl-alt: 13px;
+  --radius-5xl:  16px;
+  --radius-6xl:  20px;
+  --radius-pill: 9999px;
+  --radius-pill-alt: 99px;
+  --radius-circle: 50%;
+
+  /* ---- Motion scale ----
+     Durations cluster into three bands in the existing CSS:
+     ~.14-.16s (instant feedback: hover/active states),
+     ~.18-.20s (standard UI transitions),
+     ~.25-.38s (panel/transform motion).
+     Two distinct easing curves were already in repeated use;
+     both are named here rather than invented. */
+  --dur-fast: 0.15s;
+  --dur-base: 0.18s;
+  --dur-slow: 0.3s;
+
+  /* ---- Extended duration scale ----
+     These durations exist in the codebase but don't match the three
+     core bands above exactly. Adding them as named tokens (rather
+     than snapping to the nearest core value) preserves exact timing
+     — zero visual/motion change — while still eliminating every
+     raw magic-number duration. */
+  --dur-2xs:  0.12s;
+  --dur-xs:   0.14s;
+  --dur-sm:   0.16s;
+  --dur-md:   0.2s;
+  --dur-md-alt: 0.22s;
+  --dur-lg:   0.25s;
+  --dur-lg-alt: 0.26s;
+  --dur-lg-alt2: 0.28s;
+  --dur-xl:   0.35s;
+  --dur-xl-alt: 0.38s;
+  --dur-2xl:  0.4s;
+  --dur-3xl:  0.55s;
+
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-soft: cubic-bezier(0.2, 0.8, 0.3, 1);
+
+  /* ---- Z-index scale ----
+     Reconstructed from the existing stacking order so nothing
+     that used to render above another element now renders below it.
+     Bands, low to high:
+       local   — stacking inside a single card/row (1-2)
+       sticky  — sticky in-page headers (2, kept distinct from local via source order)
+       raised  — dropdowns, small popovers that sit above page content
+       overlay — modal / drawer backgrounds (was the repeated "900")
+       overlay-high — overlay chrome that must sit above its own overlay (901-1200 band)
+       toast   — top-level toasts/alerts (was 9000-9999) */
+  --z-local:         1;
+  --z-sticky:         2;
+  --z-raised:         5;
+  --z-raised-high:   10;
+  --z-popover:      190;
+  --z-popover-high: 201;
+  --z-overlay:      300;
+  --z-overlay-mid:  500;
+  --z-overlay-high: 600;
+  --z-modal:        800;
+  --z-modal-mid:    840;
+  --z-modal-high:   850;
+  --z-modal-max:    900;
+  --z-drawer:       999;
+  --z-drawer-high: 1200;
+  --z-drawer-top:  3000;
+  --z-toast:       9000;
+  --z-toast-mid:   9100;
+  --z-toast-high:  9200;
+  --z-critical:    9999;
+
+  /* ---- Shared gradient ----
+     This exact 3-stop teal-green gradient appears verbatim in both
+     theme-dark-wood.css (header background) and button-theme.css
+     (primary button background) — consolidated here as the single
+     source of truth. */
+  --gradient-header-teal: linear-gradient(135deg, #0d5c5f 0%, #0a4548 55%, #072e30 100%);
+
+  /* ---- Repeated dark-wood accent tokens ----
+     Each of these hex values appeared 2+ times verbatim across
+     theme-dark-wood.css. Consolidated here so future edits change
+     one place instead of N. Values unchanged — zero visual diff. */
+  --dw-white:        #fff;
+  --dw-white-full:   #ffffff;
+  --dw-meta-brown:   #7a6040;
+  --dw-meta-brown-light: #9a8060;
+  --dw-loss-red:     #9b2c2c;
+  --dw-loss-red-alt: #c0392b;
+  --dw-loss-red-alt2: #c03c3c;
+  --dw-save-hover:   #f0cc70;
+  --dw-cream-soft:   #f5efe0;
+  --dw-cream-alt:    #f2ece0;
+  --dw-hairline-warm: #cec6b4;
+  --dw-ink-warm:     #2c2418;
+  --dw-ink-warm-alt: #2c1e0a;
+  --dw-ink-deep:     #3a2810;
+  --dw-input-border: #c8c0b4;
+  --dw-input-bg:     #f0ece6;
+  --dw-input-focus:  #a09080;
+  --dw-success-green: #16a34a;
+  --dw-success-teal:  #128c7e;
+  --dw-danger-bright: #e05050;
+  --dw-danger-soft:   #e07070;
+  --dw-warm-dark:    #5a3e1a;
+  --dw-forest-green: #1a5c35;
+  --dw-forest-dark:  #1a3828;
+  --dw-amber-mid:    #7a5010;
+  --dw-amber-dark:   #8a6010;
+  --dw-gold-bright:  #e8b840;
+
+  /* ---- Card body material gradients (10 named woods/metals) ----
+     Each home-card uses a distinct 4-stop linear-gradient as its
+     "material". These are one-off per card (no repeats between
+     cards), so consolidating them is purely for naming/readability,
+     not deduplication — values unchanged. */
+  --mat-walnut:    linear-gradient(145deg, #6b3e18 0%, #56300f 30%, #4a2a0c 60%, #5e3610 100%);
+  --mat-ebony:     linear-gradient(145deg, #18202c 0%, #101620 30%, #0c1018 60%, #141c28 100%);
+  --mat-teak-brass: linear-gradient(145deg, #4e3c06 0%, #3a2a04 30%, #2e2002 60%, #443408 100%);
+  --mat-malachite: linear-gradient(145deg, #143428 0%, #0c2418 30%, #081a10 60%, #102e20 100%);
+  --mat-slate-indigo: linear-gradient(145deg, #232a44 0%, #181e34 30%, #111526 60%, #1e2438 100%);
+  --mat-crimson-copper: linear-gradient(145deg, #4a2418 0%, #36180e 30%, #2a1208 60%, #3e1e10 100%);
+  --mat-aqua-cyan: linear-gradient(145deg, #0e3a40 0%, #0a2a30 30%, #061c20 60%, #0c2e34 100%);
+  --mat-amethyst:  linear-gradient(145deg, #341e44 0%, #261432 30%, #1a0c22 60%, #2c1838 100%);
+  --mat-sapphire:  linear-gradient(145deg, #122448 0%, #0c1a36 30%, #081024 60%, #102040 100%);
+  --mat-amber-gold: linear-gradient(145deg, #483212 0%, #36240c 30%, #241608 60%, #402c10 100%);
+
+  /* ---- Icon-inner material tokens (9 named metals) ----
+     Same one-off-per-card pattern as the body materials above:
+     each icon uses a radial + linear gradient pair plus a distinct
+     text color. Consolidated for naming only — no shared duplicates
+     existed between cards, so nothing was actually deduplicated,
+     only organized. */
+  --icon-bronze-radial: radial-gradient(circle at 35% 30%, #e8a84c 0%, #a06020 40%, #5a3010 80%);
+  --icon-bronze-linear: linear-gradient(145deg, #c87830, #7a4020);
+  --icon-bronze-text:   #fff8e0;
+  --icon-steel-radial:  radial-gradient(circle at 35% 30%, #90aac0 0%, #485870 40%, #202c38 80%);
+  --icon-steel-linear:  linear-gradient(145deg, #607080, #283040);
+  --icon-steel-text:    #d0e8f8;
+  --icon-brass-radial:  radial-gradient(circle at 35% 30%, #d4b85a 0%, #8a7020 40%, #5a4808 80%);
+  --icon-brass-linear:  linear-gradient(145deg, #b89030, #705810);
+  --icon-brass-text:    #fff8e0;
+  --icon-patina-radial: radial-gradient(circle at 35% 30%, #7ab8a0 0%, #3a7060 40%, #1a3830 80%);
+  --icon-patina-linear: linear-gradient(145deg, #508870, #1e4838);
+  --icon-patina-text:   #c8f0e8;
+  --icon-indigo-radial: radial-gradient(circle at 35% 30%, #8a9ee0 0%, #4a5890 40%, #242c50 80%);
+  --icon-indigo-linear: linear-gradient(145deg, #6878b0, #303860);
+  --icon-indigo-text:   #e0e6ff;
+  --icon-copper-radial: radial-gradient(circle at 35% 30%, #e09068 0%, #a05030 40%, #5a2814 80%);
+  --icon-copper-linear: linear-gradient(145deg, #c06840, #7a3818);
+  --icon-copper-text:   #ffe8d8;
+  --icon-aqua-radial:   radial-gradient(circle at 35% 30%, #6cd4e0 0%, #2c8898 40%, #143c44 80%);
+  --icon-aqua-linear:   linear-gradient(145deg, #3aacc0, #145868);
+  --icon-aqua-text:     #d8fbff;
+  --icon-amethyst-radial: radial-gradient(circle at 35% 30%, #c896e8 0%, #7a4aa0 40%, #3c2050 80%);
+  --icon-amethyst-linear: linear-gradient(145deg, #9a64c0, #4c2868);
+  --icon-amethyst-text:   #f0e0ff;
+  --icon-sapphire-radial: radial-gradient(circle at 35% 30%, #78a8ec 0%, #3868a8 40%, #182c54 80%);
+  --icon-sapphire-linear: linear-gradient(145deg, #4a80c0, #1c3868);
+  --icon-sapphire-text:   #e0eeff;
+
+  /* ---- Status toggle button gradients (bill=red, joma=green) ---- */
+  --btn-bill-bg:        linear-gradient(160deg, #e53030 0%, #c02020 60%, #a01818 100%);
+  --btn-bill-active-bg: linear-gradient(160deg, #961414 0%, #7a0f0f 100%);
+  --btn-joma-bg:        linear-gradient(160deg, #22b55a 0%, #18924a 60%, #117a3c 100%);
+  --btn-joma-active-bg: linear-gradient(160deg, #0f6030 0%, #0a4a24 100%);
+
+  /* ---- Connection status dot colors ---- */
+  --status-idle:      #666;
+  --status-connected: #4ecb7a;
+  --status-connected-glow: #4ecb7a88;
+  --status-error-glow: #e0707088;
+
+  /* ---- Remaining single-use accent tokens (final sweep) ---- */
+  --gradient-header-accent: linear-gradient(135deg, #1fb8ae 0%, #128a83 45%, #0a4548 100%);
+  --dw-border-dark:   #3a1f08;
+  --dw-bg-deepest:    #1a0f06;
+  --gradient-gold-btn: linear-gradient(145deg, #F5D06E 0%, #E0B84A 30%, #D4A030 60%, #f0c858 90%, #c8960a 100%);
+  --dw-gold-text:     #d4a030;
+  --dw-cream-header-alt: #ede6d6;
+  --dw-amber-text:    #7a5820;
+  --dw-brown-text:    #6a4a1a;
+  --dw-brown-dark:    #3a3028;
+  --dw-sage-text:     #6a7c6e;
+  --dw-cream-input:   #f0ead8;
+  --dw-input-border-alt: #c8bc9e;
+  --dw-hover-border:  #a89880;
+  --dw-drag-icon:     #a89060;
+  --dw-cream-bright:  #fdf6e8;
+  --dw-contact-text:  #7a6848;
+  --dw-amber-badge:   #8a5416;
+  --dw-red-text:      #c05050;
+  --dw-meta-text-alt: #7a6a50;
+  --dw-brown-mid:     #5a4830;
+  --dw-red-dark:      #8a2828;
+  --dw-cream-row:     #e8dcc8;
+  --dw-gold-mid:      #c8a030;
+  --dw-amber-deep:    #8a6020;
+  --dw-amber-label:   #7a5a20;
+  --dw-red-deep:      #7a1a1a;
+  --dw-brown-deepest: #5a3a00;
+  --gradient-gold-alt: linear-gradient(135deg, #e0b84a, #c89820);
+  --dw-gold-border:   #b88010;
+  --dw-red-bright:    #ff6060;
+  --dw-bg-brown-dark: #3a2008;
+  --dw-border-gold:   #c8a860;
+  --dw-toggle-cream:  #e8e0d0;
+  --dw-toggle-gold:   #f0c040;
+  --dw-toggle-sage:   #c8d8c8;
+  --dw-toggle-sage-border: #a0b890;
+  --gradient-menu-tan: linear-gradient(160deg, #c8a96e 0%, #b8964e 50%, #a8843e 100%);
+  --gradient-menu-tan-light: linear-gradient(160deg, #d4b478 0%, #c4a458 50%, #b49248 100%);
+  --gradient-menu-tan-dark: linear-gradient(160deg, #a07840 0%, #8c6830 100%);
+  --dw-menu-text:     #f5e8cc;
+  --gradient-menu-cream: linear-gradient(180deg, #f5ede0 0%, #ede4d0 100%);
+  --gradient-bg-darkest: linear-gradient(180deg, #1c0f06 0%, #130a03 100%);
+  --dw-badge-critical: #f87171;
+  --dw-badge-warning:  #d97706;
+  --dw-badge-info:     #0284c7;
+  --dw-title-deepest:  #1a0f06;
+  --dw-desc-brown:     #5a3e28;
+  --dw-action-brown:   #7a5a3a;
+  --dw-close-muted:    #8a7a60;
+
+  /* ---- Small-label font-size scale ----
+     Every sub-11px font-size found in the codebase, used for card
+     labels, badges, and secondary/meta text. Anything under 9px was
+     bumped up to 9px (accessibility minimum for readable UI text);
+     9px-10.5px is preserved as-is since it's a deliberate small-label
+     scale, not a set of accidental one-offs. */
+  --font-2xs: 9px;
+  --font-2xs-alt: 9.5px;
+  --font-xs:  10px;
+  --font-xs-alt: 10.5px;
+}
+
+/* ---- Shared label utility classes ----
+   Consolidates 24 identical inline styles from index.html
+   (P&L report row sub-labels) into one reusable class. */
+.pl-sub-label {
+  font-size: var(--font-xs);
+  color: var(--text3, var(--dz-muted));
+}
+.pl-sub-label-bold {
+  font-size: var(--font-xs);
+  color: var(--text3, var(--dz-muted));
+  font-weight: 500;
+}
+.section-label-sm {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--text3, var(--dz-muted));
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
+/* ============================================================
+   RESPONSIVE BREAKPOINTS
+   ------------------------------------------------------------
+   This app is mobile-first, single-column, with no separate
+   app-wrapper div (body IS the content box). Strategy agreed:
+   the phone-sized layout stays exactly as-is up to 640px; above
+   that, body's content is centered and width-capped so it reads
+   like a phone mockup rather than stretching edge-to-edge.
+
+   Deliberately NOT touched: any element using position:fixed +
+   inset:0 (delete confirmations, paikkari drawer, all full-screen
+   overlays). Those stay viewport-width and dim the whole browser
+   window, even outside the centered card — confirmed acceptable,
+   this is the standard "phone mockup on a dimmed desktop backdrop"
+   pattern and requires touching 0 overlay files.
+   ============================================================ */
+
+@media (min-width: 640px) {
+  body {
+    max-width: 600px;
+    margin: 0 auto;
+    min-height: 100vh;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.12);
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    /* Slightly deeper shadow + visible edge at larger viewports so
+       the centered card doesn't look like a rendering mistake on
+       a wide desktop window. Width intentionally unchanged from
+       the 640px rule — same 600px card, per agreed scope. */
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.18);
+    border-left: 1px solid var(--dz-hairline, #e6dfd8);
+    border-right: 1px solid var(--dz-hairline, #e6dfd8);
+  }
+}

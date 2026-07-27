@@ -1,0 +1,86 @@
+/* বাটন থিম সিস্টেম — কনসোলিডেটেড (রিফ্যাক্টর করা)
+   আগে: ৪টা ফাইলে ছড়ানো ৪০+ ডিক্লারেশন, cascade + !important-নির্ভর
+   এখন: single-source-of-truth custom properties, কোনো !important লাগে না
+   */
+
+:root {
+  --btn-green-bg: var(--gradient-header-teal);
+  --btn-green-bg-solid: #0a4548;
+  --btn-green-text: #fff;
+  --btn-green-border: #0a4548;
+
+  --btn-primary-active-text: #e8eeff;
+
+  --btn-save-result-bg: var(--dz-primary, #cc785c);
+  --btn-save-result-active-bg: var(--dz-primary-active, #a9583e);
+  --btn-save-result-text: #fff;
+
+  --btn-danger-text: #e07070;
+
+  --btn-delmode-active-bg: #c0392b;
+  --btn-delmode-active-text: #fff;
+}
+
+/* থিম ১: সাধারণ সবুজ বাটন — Theme 1 + Theme 5 (আগে ছিল সম্পূর্ণ ডুপ্লিকেট, এখন এক জায়গায়) */
+#pk-body .btn-primary,
+#pk-body .btn-save,
+#pk-body .btn-go-calc,
+.fab-add-more-btn,
+.fv-entry-btn,
+.ep-save-btn,
+.fv-edit-save-btn,
+.fv-mini-save-btn,
+.db-btn:not(.danger),
+#fabricAddBtn,
+#fabricFormWrap button[onclick="fabricSave()"],
+#aggOvDelModeBtn,
+#plDelModeBtn {
+  background: var(--btn-green-bg) !important; /* বাধ্যতামূলক: #plDelModeBtn-এ inline style="background:#fff" আছে, শুধু !important দিয়েই override করা যায় */
+  background-color: var(--btn-green-bg-solid) !important;
+  color: var(--btn-green-text) !important; /* বাধ্যতামূলক: একই কারণে (inline style="color:#c0392b") */
+  -webkit-text-fill-color: var(--btn-green-text);
+  border-color: var(--btn-green-border) !important; /* বাধ্যতামূলক: body :not(header):not(.hdr):not(.hdr *) { border-color !important } spec [0,2,2]-এর চেয়ে বেশি specificity লাগত অন্যথায় */
+}
+
+/* থিম ২: .btn-primary সক্রিয় অবস্থায় হালকা নীল টেক্সট */
+#pk-body .btn-primary:active {
+  color: var(--btn-primary-active-text) !important; /* বাধ্যতামূলক: button:not(...) catch-all রুলে !important আছে */
+  -webkit-text-fill-color: var(--btn-primary-active-text) !important;
+}
+
+/* থিম ৩/৪: .btn-save — যখন #page-result-এর ভেতরে থাকে, তখন কোরাল থিম (সবুজের বদলে) */
+#pk-body #page-result .btn-save {
+  background: var(--btn-save-result-bg);
+  color: var(--btn-save-result-text);
+}
+#pk-body #page-result .btn-save:active {
+  background: var(--btn-save-result-active-bg);
+}
+
+/* থিম ৬: ডেঞ্জার (ডিলিট) বাটন — লাল টেক্সট, একই সবুজ ব্যাকগ্রাউন্ড */
+.db-btn.danger {
+  color: var(--btn-danger-text) !important; /* বাধ্যতামূলক: button:not(...) catch-all রুল সাদা রং জোর করে, লাল দরকার */
+  -webkit-text-fill-color: var(--btn-danger-text) !important;
+}
+
+/* থিম ৮: জেনেরিক আইকন বাটন — আগে ২৪-exclusion catch-all + ২০টা ডুপ্লিকেট #fff রুল ছিল */
+button {
+  color: var(--dw-white);
+  -webkit-text-fill-color: var(--dw-white);
+}
+.fab-cancel-btn {
+  color: var(--dz-ink, #141413);
+  -webkit-text-fill-color: var(--dz-ink, #141413);
+}
+.pk-close-btn {
+  color: var(--dz-muted, #6c6a64);
+  -webkit-text-fill-color: var(--dz-muted, #6c6a64);
+}
+
+#aggOvDelModeBtn.del-mode-active,
+#plDelModeBtn.del-mode-active {
+  background: var(--btn-delmode-active-bg) !important; /* বাধ্যতামূলক: inline style="background:#fff" override করতে হবে */
+  border-color: var(--btn-delmode-active-bg) !important;
+  color: var(--btn-delmode-active-text) !important; /* বাধ্যতামূলক: inline style="color:#c0392b" override করতে হবে */
+  -webkit-text-fill-color: var(--btn-delmode-active-text);
+}
