@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ইমরান ক্লথ স্টোর</title>
+  <!-- PWA সেটআপ -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#00363a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ক্লথ স্টোর">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700;800&family=Noto+Serif+Bengali:wght@400;500;600;700&family=Playfair+Display:wght@700;800;900&display=swap&font-display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js" defer></script>
+  <link rel="stylesheet" href="css/_tokens.css">
+  <link rel="stylesheet" href="css/theme-dark-wood.css">
+  <link rel="stylesheet" href="css/button-color-override.css">
+  <link rel="stylesheet" href="css/paikkari-drawer.css">
+  <link rel="stylesheet" href="css/agg-report-pl-overlay.css">
+  <link rel="stylesheet" href="css/button-theme.css">
+  <link rel="stylesheet" href="css/card-theme.css">
+</head>
+<body>
+
+<!-- HEADER
+-->
+<header class="hdr">
+
+  <div class="hdr-ribbon" aria-hidden="true"></div>
+
+  <!-- Row 1: টপবার -->
+  <div class="hdr-topbar">
+    <div class="hdr-brand">
+      <div style="padding-top:0; padding-left:38px;">
+        <div class="app-title">ইমরান ক্লথ স্টোর</div>
+        <div class="app-sub text-engraved">পাওনা লিস্ট, ক্যাশফ্লো, প্রফিট-লস</div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <button type="button" class="notif-btn" onclick="notifOpen()" title="নোটিফিকেশন">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        <span class="notif-badge" id="notifBadge"></span>
+      </button>
+      <button type="button" class="menu-btn" onclick="toggleMenu()" title="মেনু">
+        <span class="menu-bar"></span>
+        <span class="menu-bar"></span>
+        <span class="menu-bar"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Row 1.5: KPI স্ট্যাট কার্ড -->
+  <div class="kpi-strip kpi-strip-3">
+    <div class="profit-kpi-card profit-kpi-gross">
+      <div class="profit-kpi-label">Weekly Gross Profit</div>
+      <div class="profit-kpi-value" id="kpiGrossProfitStrip">—</div>
+    </div>
+    <div class="profit-kpi-card profit-kpi-net">
+      <div class="profit-kpi-label">Weekly Net Profit</div>
+      <div class="profit-kpi-value" id="kpiNetProfitStrip">—</div>
+    </div>
+    <div class="home-card card-c5 kpi-mini-card" style="cursor:default;">
+      <div class="card-body">
+        <div class="card-title">Weekly Cash Profit</div>
+        <div class="card-count" id="kpiNetCashStrip">—</div>
+      </div>
+    </div>
+  </div>
+  <!-- home-kpi-strip — header-এর ভেতরে, margin-bottom দিয়ে নিচে বের হয় -->
+  <div class="kpi-strip kpi-strip-3 home-kpi-strip">
+    <div class="home-card card-c7 kpi-mini-card" onclick="fabricOpen()">
+      <div class="card-body">
+        <div class="icon-medallion"><div class="icon-inner"><i class="fas fa-scroll"></i></div></div>
+        <div class="card-title">কাপড় ক্রয় হিসাব</div>
+      </div>
+    </div>
+    <div class="home-card card-c6 kpi-mini-card" onclick="openPLTrends()">
+      <div class="card-body">
+        <div class="icon-medallion"><div class="icon-inner"><i class="fas fa-chart-line"></i></div></div>
+        <div class="card-title">P&amp;L Trends</div>
+      </div>
+    </div>
+    <div class="home-card card-c8 kpi-mini-card" onclick="paikkariOpen('report')">
+      <div class="card-body">
+        <div class="icon-medallion"><div class="icon-inner"><i class="fas fa-file-invoice-dollar"></i></div></div>
+        <div class="card-title">সাপ্তাহিক হালনাগাদ রিপোর্ট</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: ক্যালেন্ডার কার্ড (সাদা/নীল স্টাইল) — হোম ও ড্যাশবোর্ড দুই জায়গাতেই দেখা যাবে -->
+  <div class="cal-card" id="dashCalCard">
+    <div class="cal-top">
+      <div class="cal-dates">
+        <button type="button" class="cal-date-btn js-hdr-date-btn" id="hdrDateBtn"></button>
+        <span class="cal-sep">|</span>
+        <button type="button" class="cal-date-btn js-hdr-hijri-btn" id="hdrHijriBtn"></button>
+        <span class="cal-sep">|</span>
+        <button type="button" class="cal-date-btn js-hdr-eng-btn" id="hdrEngBtn"></button>
+      </div>
+    </div>
+    <div class="hdr-week-cal">
+      <div class="hwc-day js-hwc-day" data-day-idx="1" id="hwc1"><span class="hwc-name">সোম</span><span class="hwc-date js-hwc-date" data-day-idx="1" id="hwcd1"></span></div>
+      <div class="hwc-day js-hwc-day" data-day-idx="2" id="hwc2"><span class="hwc-name">মঙ্গল</span><span class="hwc-date js-hwc-date" data-day-idx="2" id="hwcd2"></span></div>
+      <div class="hwc-day js-hwc-day" data-day-idx="3" id="hwc3"><span class="hwc-name">বুধ</span><span class="hwc-date js-hwc-date" data-day-idx="3" id="hwcd3"></span></div>
+      <div class="hwc-day js-hwc-day" data-day-idx="4" id="hwc4"><span class="hwc-name">বৃহস্পতি</span><span class="hwc-date js-hwc-date" data-day-idx="4" id="hwcd4"></span></div>
+      <div class="hwc-day js-hwc-day" data-day-idx="5" id="hwc5"><span class="hwc-name">শুক্র</span><span class="hwc-date js-hwc-date" data-day-idx="5" id="hwcd5"></span></div>
+      <div class="hwc-day js-hwc-day" data-day-idx="6" id="hwc6"><span class="hwc-name">শনি</span><span class="hwc-date js-hwc-date" data-day-idx="6" id="hwcd6"></span></div>
+      <div class="hwc-day js-hwc-day" data-day-idx="0" id="hwc0"><span class="hwc-name">রবি</span><span class="hwc-date js-hwc-date" data-day-idx="0" id="hwcd0"></span></div>
+    </div>
+  </div>
+
+  <!-- Row 3: Aggregate Report কার্ড — শুধু ড্যাশবোর্ড ট্যাবে দেখা যাবে (হোমে না) -->
+  <div class="cal-card agg-full-card" id="dashAggCard" onclick="aggOverlayOpen()">
+    <div class="cal-top">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-family:'Noto Serif Bengali', Georgia, serif; font-size:15px; font-weight:400; color:var(--dz-ink,#141413);">Aggregate Report</span>
+      </div>
+      <span id="aggOvCardSub" style="font-size:11px; color:var(--dz-muted,#6c6a64); margin-left:auto;">—</span>
+    </div>
+    <div class="agg-full-card-body" id="aggFullCardBody">
+      <div class="agg-full-stat">
+        <span class="agg-full-stat-label">In Flow</span>
+        <span class="agg-full-stat-val" id="aggFullIn">—</span>
+      </div>
+      <div class="agg-full-stat">
+        <span class="agg-full-stat-label">Out Flow</span>
+        <span class="agg-full-stat-val" id="aggFullOut">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 4: Fund Flow Overview কার্ড (ক্যালেন্ডার কার্ডের মতো বড়/ফুল-উইথ, ডাটা সরাসরি কার্ডেই দৃশ্যমান) -->
+  <div class="cal-card fundflow-card" id="dashFundFlowCard">
+
+    <!-- empty state (হোম কার্ডে) -->
+    <div id="ffh-empty" style="display:none; flex-direction:column; align-items:center; justify-content:center; padding:20px 16px 22px; gap:8px; text-align:center;">
+      <div style="font-size:28px; opacity:0.25;"></div>
+      <div style="font-size:12.5px; line-height:1.6; color:#9a96ad;">এখনো কোনো হিসাব নেই</div>
+    </div>
+
+    <!-- data state (হোম কার্ডে সরাসরি দৃশ্যমান) -->
+    <div id="ffh-data" class="ffh-data" style="display:none;">
+      <div style="display:flex; align-items:center; gap:0; padding:4px 8px 4px 0;">
+        <div style="flex:0 0 auto; display:flex; align-items:center; justify-content:center; margin-left:-10px;">
+          <svg id="ffh-svgPie" width="138" height="138" viewBox="0 0 130 130" style="display:block; overflow:visible;"></svg>
+        </div>
+        <div id="ffh-legend" style="flex:1 1 0; min-width:0; padding-left:0; margin-left:-6px; display:flex; flex-direction:column; gap:5px;"></div>
+      </div>
+
+      <!-- সাপ্তাহিক রিপোর্ট সতর্ক বার্তা (Fund Flow-এর নিচে) -->
+      <div id="ffh-alertLoss" class="alert-banner ab-critical" style="margin:4px 12px 2px; padding:6px 9px; border-radius:9px;">
+        <div class="ab-icon"></div>
+        <div class="ab-body">
+          <div><span class="ab-sev-badge">CRITICAL LOSS</span></div>
+          <div class="ab-title">নিট লোকসান সতর্কতা — Net Loss Alert</div>
+          <div class="ab-desc">এই সপ্তাহে মোট ব্যয় আয়কে ছাড়িয়ে গেছে। COGS ও পরিচালন ব্যয় পুনর্যাচাই করুন।</div>
+          <div class="ab-action">১. COGS পুনর্যাচাই ২. পরিচালন ব্যয় কমানোর সুযোগ দেখুন ৩. বিক্রয়মূল্য পর্যালোচনা করুন</div>
+        </div>
+        <button type="button" class="ab-close" onclick="dismissAlert('ffh-alertLoss')">×</button>
+      </div>
+
+      <div id="ffh-alertLiquidity" class="alert-banner ab-warning" style="margin:2px 12px; padding:6px 9px; border-radius:9px;">
+        <div class="ab-icon"></div>
+        <div class="ab-body">
+          <div><span class="ab-sev-badge">WARNING — Liquidity Risk</span></div>
+          <div class="ab-title">তারল্য ঝুঁকি — Credit Sales &gt; 60%</div>
+          <div class="ab-desc">মোট বিক্রয়ের ৬০%-এর বেশি বাকিতে। নগদ প্রবাহে সমস্যার ঝুঁকি আছে।</div>
+          <div class="ab-action">১. পুরনো বাকি আদায় ত্বরান্বিত করুন ২. Cash Discount বিবেচনা করুন</div>
+        </div>
+        <button type="button" class="ab-close" onclick="dismissAlert('ffh-alertLiquidity')">×</button>
+      </div>
+
+      <div id="ffh-alertCashGap" class="alert-banner ab-info" style="margin:2px 12px 4px; padding:6px 9px; border-radius:9px;">
+        <div class="ab-icon"></div>
+        <div class="ab-body">
+          <div><span class="ab-sev-badge">INFO — Accrual Gap</span></div>
+          <div class="ab-title">নগদ ঘাটতি — P&amp;L লাভ সত্ত্বেও Cashflow ঋণাত্মক</div>
+          <div class="ab-desc">বাকি ক্রয় বা বকেয়া পরিশোধ ক্যাশফ্লো কমাচ্ছে।</div>
+          <div class="ab-action">১. বাকি আদায় আগে করুন ২. ক্রয় পেমেন্ট সিডিউল পুনর্বিন্যাস করুন</div>
+        </div>
+        <button type="button" class="ab-close" onclick="dismissAlert('ffh-alertCashGap')">×</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 5: সাপ্তাহিক তথ্য হালনাগাদ স্বাগত কার্ড — ইমরান ক্লথ স্টোর হিরো থিম -->
+  <div class="cal-card" id="dashWeeklyUpdateWelcomeCard" style="padding:0; overflow:hidden; position:relative; min-height:160px; display:flex; align-items:center; justify-content:center; border-radius:12px;
+    background-image: linear-gradient(oklch(0% 0 0 / 0.28), oklch(0% 0 0 / 0.36)), url('https://images.unsplash.com/photo-1651132135902-6b39cd8cad31?auto=format&fit=crop&w=800&q=80');
+    background-size: cover; background-position: center;">
+    <div style="position:relative; z-index:1; text-align:center; padding:22px 18px 18px; display:flex; flex-direction:column; align-items:center; gap:13px; width:100%;">
+      <div style="font-family:'Noto Serif Bengali', 'Noto Sans Bengali', serif; font-size:15.5px; font-weight:600; line-height:1.65; letter-spacing:0.01em; color:oklch(84.71% 0.199 83.87); text-shadow:0 1px 5px rgba(0,0,0,0.60); max-width:300px;">
+        চলতি সপ্তাহের আর্থিক লেনদেনের সমস্ত তথ্য ইনপুট দিয়ে আপনার ব্যবসায়ের হিসাবগুলো হালনাগাদ রাখুন।
+      </div>
+      <button type="button" id="weeklyUpdateBtn" onclick="paikkariOpen('quickaction')" style="margin-top:2px; padding:8px 18px; border:none; border-radius:9px;
+        background:linear-gradient(135deg, oklch(32% 0.10 160), oklch(27% 0.09 180));
+        color:oklch(88% 0.12 160); font-size:13px; font-weight:800; font-family:inherit; letter-spacing:0.02em; cursor:pointer;
+        box-shadow: 0 3px 12px oklch(32% 0.10 160 / 0.35);
+        display:inline-flex; align-items:center; justify-content:center; gap:5px;">
+        সাপ্তাহিক তথ্য হালনাগাদ
+      </button>
+    </div>
+  </div>
+
+  <!-- সব block ফাইলের আগে: shared HTML-escape utility (window._esc) -->
+  <script src="js/util-shared.js"></script>
+  <script src="js/shared-state.js"></script>
+
+  <script src="js/header-week-calendar.js"></script>
+
+  <!-- বাংলা/হিজরি তারিখ স্ক্রিপ্ট (বাটন কার্ডের ভেতরে স্থানান্তরিত) -->
+  <script src="js/header-bangla-date.js"></script>
+
+  <script src="js/header-hijri-date.js"></script>
+
+  <script src="js/header-english-date.js"></script>
+
+</header>
+
+<!-- MAIN — চারটা হোম কার্ড
+-->
+<main class="main">
+  <div class="home-grid">
+  </div>
+</main>
+
+<!-- হোম পেজ — ড্যাশবোর্ড স্ক্রিনের দ্বিতীয় পেজ
+-->
+<div class="home-screen-wrap" id="homeScreen">
+  <!-- বডি -->
+  <div class="home-screen-body" id="pk-body-home">
+    <div class="home-grid" id="homeCardsGrid" style="margin:0;">
+
+      <!-- কার্ড ১: রেগুলার কাস্টমার -->
+      <div class="home-card card-c1" onclick="fvOpen(1)">
+        <div class="card-body">
+          <div class="icon-medallion"><div class="icon-inner"><i class="fas fa-users"></i></div></div>
+          <div class="card-title">রেগুলার কাস্টমার</div>
+          <div class="card-count" id="c1CardStat">মোট ০ জন · ৳০</div>
+        </div>
+      </div>
+
+      <!-- কার্ড ২: ইর-রেগুলার কাস্টমার -->
+      <div class="home-card card-c2" onclick="fvOpen(2)">
+        <div class="card-body">
+          <div class="icon-medallion"><div class="icon-inner"><i class="fas fa-user-minus"></i></div></div>
+          <div class="card-title">ইর-রেগুলার কাস্টমার</div>
+          <div class="card-count" id="c2CardStat">মোট ০ জন · ৳০</div>
+        </div>
+      </div>
+
+      <!-- কার্ড ৯: ডাটাবেইজ সংযোগ -->
+      <div class="home-card card-c9" onclick="dbConnectOpen()">
+        <div class="card-body">
+          <div class="icon-medallion"><div class="icon-inner"><i class="fas fa-database"></i></div></div>
+          <div class="card-title">ডাটাবেইজ সংযোগ</div>
+          <div class="card-count" id="c9CardStat">যাচাই হচ্ছে…</div>
+        </div>
+      </div>
+
+      <!-- কার্ড ৩: রেগুলার মহাজন -->
+      <div class="home-card card-c3" onclick="fvOpen(3)">
+        <div class="card-body">
+          <div class="icon-medallion"><div class="icon-inner"><i class="fas fa-truck"></i></div></div>
+          <div class="card-title">রেগুলার মহাজন</div>
+          <div class="card-count" id="c3CardStat">মোট ০ জন · ৳০</div>
+        </div>
+      </div>
+
+      <!-- কার্ড ৪: ইর-রেগুলার মহাজন -->
+      <div class="home-card card-c4" onclick="fvOpen(4)">
+        <div class="card-body">
+          <div class="icon-medallion"><div class="icon-inner"><i class="fas fa-truck-loading"></i></div></div>
+          <div class="card-title">ইর-রেগুলার মহাজন</div>
+          <div class="card-count" id="c4CardStat">মোট ০ জন · ৳০</div>
+        </div>
+      </div>
+
+      <!-- কার্ড ১০: পার্টি -->
+      <div class="home-card card-c10" onclick="partyOpen()">
+        <div class="card-body">
+          <div class="icon-medallion"><div class="icon-inner"><i class="fas fa-handshake"></i></div></div>
+          <div class="card-title">পার্টি</div>
+          <div class="card-count" id="c10CardStat">মোট ০ জন · ৳০</div>
+        </div>
+      </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- AGGREGATE REPORT OVERLAY
+-->
+<div id="aggOverlay" style="display:none; position:fixed; inset:0; z-index:900;
+  background:var(--bg,#f5f0eb); flex-direction:column; overflow:hidden;">
+
+  <!-- হেডার -->
+  <div style="display:flex; align-items:center; gap:10px;
+    padding:12px 14px; background:var(--surface,#fff);
+    border-bottom:1px solid var(--border,#e5e5e5);
+    position:sticky; top:0; z-index:2;">
+    <button type="button" onclick="aggOverlayClose()" style="width:48px; height:48px; border-radius:0; margin-left:-8px;
+      border:none; background:transparent; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--text2,#555); padding:0;">
+      <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor"><path d="M16 7.5a.5.5 0 0 0-.5-.5H6.71l3.15-3.15a.5.5 0 0 0-.707-.707l-4 4a.5.5 0 0 0-.146.351V7.5a.5.5 0 0 0 .147.35l4 4a.5.5 0 0 0 .707-.707l-3.15-3.15h8.79a.5.5 0 0 0 .5-.5z"/></svg>
+    </button>
+    <span style="font-size:13px; font-weight:700; color:var(--text,#222);
+      letter-spacing:0.02em; border-left:2px solid #cc785c; padding-left:8px;">Aggregate Report</span>
+    <span id="aggOvSub" style="font-size:11px; color:var(--text3,#888); margin-left:4px;"></span>
+    <div style="flex:1;"></div>
+    <button type="button" id="aggOvDelModeBtn" onclick="aggOvToggleDelMode()" style="
+      border:1px solid #d8988a; background:#fff; color:#c0392b; border-radius:8px;
+      padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer;
+      font-family:'Noto Sans Bengali',sans-serif; white-space:nowrap;">ডিলিট মুড</button>
+  </div>
+
+  <!-- বডি -->
+  <div style="flex:1; overflow-y:auto; padding:12px 10px 80px;">
+
+    <!-- খালি state -->
+    <div id="aggOvEmpty" style="display:none; padding:50px 20px; text-align:center;">
+      <div style="font-size:40px; opacity:0.2;"></div>
+      <div style="font-size:13px; color:var(--text3,#888); margin-top:12px; line-height:1.7;">
+        এখনো কোনো সাপ্তাহিক হিসাব নেই
+      </div>
+    </div>
+
+    <!-- টেবিল -->
+    <div id="aggOvTableWrap" style="display:none; overflow-x:auto;">
+      <table class="agg-inline-table">
+        <thead>
+          <tr>
+            <th>সপ্তাহ</th>
+            <th>Sales</th>
+            <th>Net Profit</th>
+            <th>Gross Profit</th>
+            <th>In Flow</th>
+            <th>Out Flow</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="aggOvTbody"></tbody>
+        <tfoot>
+          <tr>
+            <td>মোট</td>
+            <td id="aggOvTSales">—</td>
+            <td id="aggOvTNet">—</td>
+            <td id="aggOvTGross">—</td>
+            <td id="aggOvTIn">—</td>
+            <td id="aggOvTOut">—</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- কাপড় ক্রয় হিসাব OVERLAY
+-->
+<div id="fabricOverlay" style="display:none; position:fixed; inset:0; z-index:900;
+  background:#faf9f5; flex-direction:column; overflow:hidden; font-family:var(--fab-sans,'Noto Sans Bengali',sans-serif);">
+
+  <!-- হেডার -->
+  <div style="display:flex; align-items:center; gap:10px;
+    padding:14px; background:#faf9f5;
+    border-bottom:1px solid #e6dfd8;
+    position:sticky; top:0; z-index:2;">
+    <button type="button" onclick="fabricClose()" style="width:44px; height:44px; border-radius:8px; margin-left:-8px;
+      border:none; background:transparent; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; flex-shrink:0; color:#3d3d3a; padding:0;">
+      <svg width="22" height="22" viewBox="0 0 16 16" fill="currentColor"><path d="M16 7.5a.5.5 0 0 0-.5-.5H6.71l3.15-3.15a.5.5 0 0 0-.707-.707l-4 4a.5.5 0 0 0-.146.351V7.5a.5.5 0 0 0 .147.35l4 4a.5.5 0 0 0 .707-.707l-3.15-3.15h8.79a.5.5 0 0 0 .5-.5z"/></svg>
+    </button>
+    <span style="font-family:var(--fab-serif,Georgia,serif); font-size:18px; font-weight:400; color:#141413;
+      letter-spacing:-0.2px;">কাপড় ক্রয় হিসাব</span>
+    <div style="flex:1;"></div>
+    <button type="button" onclick="fabricToggleForm()" id="fabricAddBtn" style="
+      background:#cc785c; color:#fff; border:none; border-radius:8px;
+      padding:8px 14px; font-size:12px; font-weight:600; cursor:pointer;
+      font-family:var(--fab-sans,'Noto Sans Bengali',sans-serif); transition:background .15s;">+ এন্ট্রি</button>
+  </div>
+
+  <!-- এন্ট্রি ফর্ম (collapse/expand) -->
+  <div id="fabricFormWrap" style="display:none; background:#efe9de;
+    border-bottom:1px solid #e6dfd8; padding:16px 14px 18px;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+
+      <div style="grid-column:1/-1;">
+        <label class="fab-label">কাপড়ের নাম / ধরন</label>
+        <input id="fabName" type="text" placeholder="যেমন: পপলিন, ভয়েল, কটন…"
+          style="width:100%; box-sizing:border-box;" class="fab-input">
+      </div>
+
+      <div>
+        <label class="fab-label">পরিমাণ</label>
+        <input id="fabQty" type="number" placeholder="0" min="0" step="0.5"
+          class="fab-input" style="width:100%; box-sizing:border-box;">
+      </div>
+      <div>
+        <label class="fab-label">একক</label>
+        <select id="fabUnit" class="fab-input" style="width:100%; box-sizing:border-box;">
+          <option value="গজ">গজ</option>
+          <option value="মিটার">মিটার</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="fab-label">একক দর (টাকা)</label>
+        <input id="fabRate" type="number" placeholder="0" min="0"
+          class="fab-input" style="width:100%; box-sizing:border-box;">
+      </div>
+
+    </div>
+
+    <!-- মোট preview -->
+    <div id="fabTotalPreview" style="text-align:right; font-size:14px; font-weight:700; font-family:var(--fab-mono,monospace);
+      color:#a9583e; margin-bottom:12px; min-height:18px;"></div>
+
+    <div style="display:flex; gap:10px;">
+      <button type="button" onclick="fabricSave()" style="flex:1; background:#cc785c;
+        color:#fff; border:none; border-radius:8px; padding:11px; font-size:13px;
+        font-weight:600; cursor:pointer; font-family:var(--fab-sans,'Noto Sans Bengali',sans-serif); transition:background .15s;">
+        সেভ করুন
+      </button>
+      <button type="button" onclick="fabricToggleForm()" class="fab-cancel-btn" style="background:#faf9f5;
+        color:#141413; border:1px solid #e6dfd8; border-radius:8px; padding:11px 16px;
+        font-size:13px; cursor:pointer; font-family:var(--fab-sans,'Noto Sans Bengali',sans-serif);">বাতিল</button>
+    </div>
+  </div>
+
+  <!-- ডাটা টেবিল -->
+  <div style="flex:1; overflow-y:auto; padding:10px 10px 80px; background:#faf9f5;">
+
+    <!-- খালি state -->
+    <div id="fabricEmpty" style="padding:60px 20px; text-align:center;">
+      <div style="font-size:13px; color:#8e8b82; margin-top:14px; line-height:1.7; font-family:var(--fab-sans,sans-serif);">
+        এখনো কোনো ক্রয় হিসাব নেই<br>উপরের <b style="color:#cc785c;">+ এন্ট্রি</b> বাটন চেপে শুরু করুন
+      </div>
+    </div>
+
+    <!-- ফিল্টার / সার্চ -->
+    <div id="fabricFilterBar" style="display:none; margin-bottom:10px;">
+      <div style="position:relative;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8e8b82" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round"
+          style="position:absolute; left:13px; top:50%; transform:translateY(-50%); pointer-events:none;">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input id="fabricSearch" type="text" placeholder="নাম বা সরবরাহকারী খুঁজুন…"
+          oninput="fabricRender()" class="fab-input"
+          style="width:100%; box-sizing:border-box; font-size:13px; padding-left:36px;
+          border:1px solid #e6dfd8; border-radius:10px; background:#fff;
+          transition:border-color .15s, box-shadow .15s;"
+          onfocus="this.style.borderColor='#cc785c'; this.style.boxShadow='0 0 0 3px rgba(204,120,92,0.12)';"
+          onblur="this.style.borderColor='#e6dfd8'; this.style.boxShadow='none';">
+      </div>
+    </div>
+
+    <!-- কার্ড লিস্ট -->
+    <div id="fabricTableWrap" style="display:none;">
+      <div id="fabricCardsList"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PROFIT & LOSS TRENDS OVERLAY
+-->
+<div id="plTrendsOverlay" style="
+  display:none; position:fixed; inset:0; z-index:900;
+  background:#faf9f5;
+  flex-direction:column; overflow:hidden; font-family:var(--fab-sans,'Noto Sans Bengali',sans-serif);
+">
+  <!-- হেডার -->
+  <div style="
+    display:flex; align-items:center; gap:10px;
+    padding:14px; background:#faf9f5;
+    border-bottom:1px solid #e6dfd8;
+    position:sticky; top:0; z-index:2;
+  ">
+    <button type="button" onclick="closePLTrends()" style="
+      width:44px; height:44px; border-radius:8px; margin-left:-8px;
+      border:none; background:transparent; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; flex-shrink:0; color:#3d3d3a; padding:0;
+    "><svg width="22" height="22" viewBox="0 0 16 16" fill="currentColor"><path d="M16 7.5a.5.5 0 0 0-.5-.5H6.71l3.15-3.15a.5.5 0 0 0-.707-.707l-4 4a.5.5 0 0 0-.146.351V7.5a.5.5 0 0 0 .147.35l4 4a.5.5 0 0 0 .707-.707l-3.15-3.15h8.79a.5.5 0 0 0 .5-.5z"/></svg></button>
+    <span style="font-family:var(--fab-serif,Georgia,serif); font-size:18px; font-weight:400; color:#141413; letter-spacing:-0.2px;">Profit &amp; Loss Trends</span>
+    <div style="flex:1;"></div>
+    <button type="button" id="plDelModeBtn" onclick="plToggleDelMode()" style="
+      border:1px solid #d8988a; background:#fff; color:#c0392b; border-radius:8px;
+      padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer;
+      font-family:'Noto Sans Bengali',sans-serif; white-space:nowrap;">ডিলিট মুড</button>
+  </div>
+  <!-- বডি -->
+  <div style="flex:1; overflow-y:auto; padding:16px 14px; background:#faf9f5;" id="pk-body-plTrends">
+    <div style="background:#efe9de; border-radius:12px; border:1px solid #e6dfd8; padding:16px 14px 10px;">
+      <div class="rev-bar-scroll" id="plR-revBarScroll" style="padding:4px 0 6px;">
+        <svg id="plR-svgRevBar" style="display:block;overflow:visible;"></svg>
+      </div>
+    </div>
+    <div id="plR-empty" style="display:none; padding:60px 20px; text-align:center;">
+      <div style="font-size:13px; color:#8e8b82; margin-top:12px; line-height:1.6; font-family:var(--fab-sans,sans-serif);">এখনো কোনো হিসাব নেই</div>
+    </div>
+  </div>
+</div>
+
+<!-- FUND FLOW OVERVIEW OVERLAY
+-->
+
+<!-- BOTTOM TAB BAR — ফ্লোটিং নেভিগেশন
+-->
+<div class="bottom-tab-bar" id="bottomTabBar">
+  <button type="button" class="btab-btn active" id="btabDashboard" onclick="btabSwitch('dashboard')">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    <span>ড্যাশবোর্ড</span>
+  </button>
+  <button type="button" class="btab-btn" id="btabHome" onclick="btabSwitch('home')">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>হোম</span>
+  </button>
+</div>
+
+<!-- ফুল স্ক্রিন লিস্ট ভিউ
+-->
+<div class="fv-screen wood-panel-bg" id="fvScreen">
+
+  <!-- এন্ট্রি ফর্ম পপআপ backdrop -->
+  <div class="fv-form-backdrop" id="fvFormBackdrop" onclick="fvToggleEntryForm()"></div>
+
+  <!-- এন্ট্রি ফর্ম পপআপ — উপর থেকে slide down -->
+  <div class="fv-inline-form" id="fvInlineForm">
+    <div class="fv-inline-form-inner" id="fvInlineFormInner"></div>
+  </div>
+
+  <!-- হেডার -->
+  <div class="fv-header">
+    <div class="fv-hdr-top">
+      <div style="display:flex;align-items:center;gap:3px;">
+        <div class="fv-hdr-icon" id="fvHdrIcon"></div>
+        <div>
+          <div class="fv-hdr-title" id="fvHdrTitle"></div>
+          <div class="fv-hdr-sub"   id="fvHdrSub"></div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <button type="button" class="fv-entry-btn" id="fvEntryBtn" onclick="fvToggleEntryForm()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          নতুন এন্ট্রি
+        </button>
+        <button type="button" class="fv-back-btn" onclick="fvClose()">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- লং প্রেস অ্যাকশন বার — লুকানো থাকে, লং প্রেসে দেখা যায় -->
+    <div class="fv-lp-action-bar" id="fvLpActionBar">
+      <span class="fv-lp-action-name" id="fvLpActionName"></span>
+      <div class="fv-lp-action-btns">
+        <button type="button" class="fv-lp-edit-btn" id="fvLpEditBtn" onclick="_fvLpEdit()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          এডিট
+        </button>
+        <button type="button" class="fv-lp-del-btn" id="fvLpDelBtn" onclick="_fvLpDelete()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          ডিলিট
+        </button>
+        <button type="button" class="fv-lp-cancel-btn" onclick="_fvLpClear()">×</button>
+      </div>
+    </div>
+
+    <div class="fv-search-wrap">
+      <input class="fv-search" id="fvSearch" type="text" placeholder="নাম বা ঠিকানা খুঁজুন..." oninput="_fvSearchDebounced()">
+    </div>
+  </div>
+
+  <!-- লিস্ট বডি -->
+  <div class="fv-body" id="fvBody"></div>
+
+</div>
+
+<!-- ডিটেইল ফুলস্ক্রিন উইন্ডো
+-->
+<div class="fv-detail-screen" id="fvDetailScreen">
+
+  <!-- হেডার -->
+  <div class="fv-detail-header">
+    <div style="flex:1;min-width:0;">
+      <div class="fv-detail-name" id="fvDetailName"></div>
+      <div class="fv-detail-meta" id="fvDetailMeta"></div>
+    </div>
+    <button type="button" class="fv-back-btn" onclick="fvDetailDelete()" title="মুছে ফেলুন" style="color:#c0392b;margin-right:2px;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+    </button>
+    <button type="button" class="fv-back-btn" onclick="fvDetailClose()">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>
+    </button>
+  </div>
+
+  <!-- বডি: Excel টেবিল + বকেয়া/জমা বাটন + মিনি ফর্ম -->
+  <div class="fv-detail-body" id="fvDetailBody"></div>
+
+</div>
+
+<!-- DEBTORS LIST স্ক্রিন
+-->
+<div class="dl-screen" id="dlScreen">
+
+  <!-- হেডার -->
+  <div class="dl-header">
+    <div class="dl-hdr-top">
+      <div class="dl-hdr-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+      </div>
+      <div class="dl-hdr-info">
+        <div class="dl-hdr-title">Party Ledger</div>
+        <div class="dl-hdr-sub">সকল দেনাদার/পাওনাদারের সম্মিলিত তালিকা</div>
+      </div>
+      <button type="button" class="fv-back-btn" onclick="dlBack()">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>
+      </button>
+    </div>
+
+    <!-- ক্যাটাগরি ফিল্টার ট্যাব -->
+    <div class="dl-tabs" id="dlTabs">
+      <button type="button" class="dl-tab active" data-cat="all" onclick="dlTabChange(this,'all')">সবাই</button>
+      <button type="button" class="dl-tab" data-cat="1" onclick="dlTabChange(this,'1')">রেগুলার কাস্টমার</button>
+      <button type="button" class="dl-tab" data-cat="2" onclick="dlTabChange(this,'2')">ইর-রেগুলার কাস্টমার</button>
+      <button type="button" class="dl-tab" data-cat="3" onclick="dlTabChange(this,'3')">রেগুলার মহাজন</button>
+      <button type="button" class="dl-tab" data-cat="4" onclick="dlTabChange(this,'4')">ইর-রেগুলার মহাজন</button>
+    </div>
+
+    <!-- সার্চ -->
+    <div class="dl-search-wrap">
+      <input class="dl-search" id="dlSearch" type="search" placeholder="নাম বা ঠিকানা খুঁজুন…" oninput="_dlSearchDebounced()">
+    </div>
+  </div>
+
+  <!-- বডি -->
+  <div class="dl-body" id="dlBody">
+    <div class="dl-table-wrap" id="dlTableWrap"></div>
+    <div class="dl-foot" id="dlFoot" style="display:none">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:1px">
+        <span class="dl-foot-lbl">মোট পাওনা</span>
+        <span class="dl-foot-val" id="dlFootPawona">৳০</span>
+      </div>
+      <div style="width:1px;height:30px;background:rgba(160,130,80,.3);"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:1px">
+        <span class="dl-foot-lbl">মোট বকেয়া</span>
+        <span class="dl-foot-val" id="dlFootBokea">৳০</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DL জমা মোডাল -->
+  <div id="dlJomaOverlay" onclick="if(event.target===this)dlJomaClose()" style="display:none;position:fixed;inset:0;z-index:900;background:rgba(0,0,0,0.55);align-items:center;justify-content:center;">
+    <div style="background:#faf9f5;border-radius:14px;width:92%;max-width:360px;box-shadow:0 8px 32px rgba(0,0,0,0.55);border:1.5px solid rgba(184,144,42,0.5);overflow:hidden;">
+      <div style="background:linear-gradient(135deg,#1a3828,#224a34);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div>
+            <div style="font-size:13px;font-weight:800;color:#e0b84a;">&#x1F4B0; জমা এন্ট্রি</div>
+            <div id="dlJomaName" style="font-size:10px;color:#a09070;margin-top:1px;"></div>
+          </div>
+        </div>
+        <button type="button" onclick="dlJomaClose()" style="background:none;border:none;cursor:pointer;color:#a09070;font-size:18px;line-height:1;padding:2px 6px;">&#x2715;</button>
+      </div>
+      <div style="padding:16px;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:10px;">
+          <div class="fv-mini-field" style="flex:1;margin-top:10px;">
+            <fieldset><legend>তারিখ</legend>
+              <input class="fv-mini-inp" id="dlJomaDate" type="text" placeholder=" "
+                onfocus="this.type='date';this.placeholder=''"
+                onblur="if(!this.value){this.type='text';this.placeholder=' ';_fvMiniFV(this)}else{_fvMiniFV(this)}"
+                onchange="_fvMiniFV(this)">
+            </fieldset>
+            <label class="fv-mini-label">তারিখ</label>
+          </div>
+          <div class="fv-mini-field" style="flex:1;margin-top:10px;">
+            <fieldset><legend>জমার পরিমাণ</legend>
+              <input class="fv-mini-inp amt" id="dlJomaAmt" type="number" inputmode="decimal" placeholder=" " oninput="_fvMiniFV(this)">
+            </fieldset>
+            <label class="fv-mini-label">জমার পরিমাণ</label>
+          </div>
+        </div>
+        <div class="fv-mini-field" style="margin-top:10px;">
+          <fieldset><legend>মন্তব্য</legend>
+            <input class="fv-mini-inp" id="dlJomaNote" type="text" placeholder=" " oninput="_fvMiniFV(this)">
+          </fieldset>
+          <label class="fv-mini-label">মন্তব্য</label>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px;">
+          <button type="button" onclick="dlJomaClose()" style="font-family:'Noto Sans Bengali',sans-serif;padding:7px 16px;border-radius:8px;border:1.5px solid rgba(160,130,80,0.4);background:transparent;color:#6a5a40;font-size:12px;font-weight:700;cursor:pointer;">বাতিল</button>
+          <button type="button" onclick="dlJomaSave()" style="font-family:'Noto Sans Bengali',sans-serif;padding:7px 18px;border-radius:8px;border:1.5px solid rgba(184,144,42,0.4);background:#e0b84a;color:#1a0f06;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:5px;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>সেভ করুন
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- এডিট মোডাল
+-->
+<div class="fv-edit-modal-overlay" id="fvEditOverlay" onclick="if(event.target===this)fvEditClose()">
+  <div class="fv-edit-modal" style="background:#faf9f5;">
+    <div class="fv-edit-modal-head">
+      <span class="fv-edit-modal-title">তথ্য সম্পাদনা করুন</span>
+      <button type="button" class="fv-edit-modal-close" onclick="fvEditClose()">×</button>
+    </div>
+    <div class="fv-edit-modal-body">
+      <div class="fv-edit-field">
+        <fieldset><legend>নাম *</legend><input class="fv-edit-inp" id="fvEditName" type="text" placeholder=" " oninput="_fvEditFV(this)"></fieldset>
+        <label class="fv-edit-label">নাম <span style="color:#e07070">*</span></label>
+      </div>
+      <div class="fv-edit-field">
+        <fieldset><legend>ঠিকানা</legend><input class="fv-edit-inp" id="fvEditAddr" type="text" placeholder=" " oninput="_fvEditFV(this)"></fieldset>
+        <label class="fv-edit-label">ঠিকানা</label>
+      </div>
+      <div class="fv-edit-field">
+        <div class="fv-edit-mob-wrap">
+          <span class="fv-edit-mob-prefix">+88</span>
+          <input class="fv-edit-inp" id="fvEditMob" type="tel" inputmode="numeric" placeholder=" ">
+        </div>
+      </div>
+    </div>
+    <div class="fv-edit-modal-foot">
+      <button type="button" class="fv-edit-cancel-btn" onclick="fvEditClose()">বাতিল</button>
+      <button type="button" class="fv-edit-save-btn" onclick="fvEditSave()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        সেভ করুন
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SIDE MENU
+-->
+<div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
+<nav class="side-menu" id="sideMenu">
+  <div class="side-menu-head">
+    <div class="side-menu-title text-engraved">মেনু</div>
+    <button type="button" class="menu-close-btn" onclick="closeMenu()">×</button>
+  </div>
+  <div class="side-menu-body">
+
+  </div>
+</nav>
+
+<!-- নোটিফিকেশন প্যানেল
+-->
+<div class="notif-overlay" id="notifOverlay" onclick="if(event.target===this)notifClose()">
+  <div class="notif-panel wood-panel-bg">
+    <div class="notif-head">
+      <span class="notif-head-title">নোটিফিকেশন</span>
+      <button type="button" class="notif-clear-btn" onclick="notifClear()">সব মুছো</button>
+    </div>
+    <div class="notif-list" id="notifList">
+      <div class="notif-empty" id="notifEmpty">কোনো নোটিফিকেশন নেই</div>
+    </div>
+  </div>
+</div>
+
+<!-- ডাটাবেইজ সংযোগ মোডাল
+-->
+<div class="db-overlay" id="dbOverlay" onclick="if(event.target===this)dbClose()">
+  <div class="db-modal wood-panel-bg">
+    <div class="db-head">
+      <span class="db-title">ফায়ারবেস ডাটাবেইজ</span>
+      <button type="button" class="modal-close-bold" onclick="dbClose()">×</button>
+    </div>
+
+    <div class="db-status-bar">
+      <div class="db-dot" id="dbDot"></div>
+      <div>
+        <div class="db-status-text" id="dbStatusText">সংযোগ যাচাই করা হচ্ছে…</div>
+        <div class="db-last-sync" id="dbLastSync"></div>
+      </div>
+    </div>
+
+    <div class="db-actions">
+      <button type="button" class="db-btn" id="dbPushBtn" onclick="dbPush()">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <div style="text-align:left">
+          <div>ক্লাউডে আপলোড করো</div>
+          <div style="font-size:10px;font-weight:400;color:var(--muted)">ফোনের ডেটা → Firebase</div>
+        </div>
+      </button>
+      <button type="button" class="db-btn" id="dbPullBtn" onclick="dbPull()">
+        <i class="fas fa-cloud-download-alt"></i>
+        <div style="text-align:left">
+          <div>ক্লাউড থেকে ডাউনলোড করো</div>
+          <div style="font-size:10px;font-weight:400;color:var(--muted)">Firebase → ফোনের ডেটা</div>
+        </div>
+      </button>
+      <button type="button" class="db-btn danger" onclick="dbConfirmWipe()">
+        <i class="fas fa-trash-alt"></i>
+        <div style="text-align:left">
+          <div>ক্লাউড ডেটা মুছে ফেলো</div>
+          <div style="font-size:10px;font-weight:400;color:var(--muted)">Firebase থেকে সব ডিলিট</div>
+        </div>
+      </button>
+    </div>
+
+    <div class="db-info" id="dbInfoText">
+      আপলোড করলে ফোনের সব ডেটা Firebase-এ সেভ হবে।<br>
+      ডাউনলোড করলে Firebase-এর ডেটা ফোনে আসবে।
+    </div>
+  </div>
+</div>
+
+<!-- JAVASCRIPT
+-->
+<script src="js/nav-shell.js"></script>
+<script src="js/firebase-sync.js"></script>
+<script src="js/fund-flow-ledger.js"></script>
+<script src="js/debtors-list.js"></script>
+
+  <!-- PWA — Service Worker রেজিস্ট্রেশন
+  -->
+  <script src="js/pwa-service-worker.js"></script>
+  <script src="capacitor.js" defer></script>
+  <script src="js/capacitor-native-bridge.js" defer></script>
+
+<!-- PAIKKARI FULLSCREEN OVERLAY -->
+
+<div id="paikkariOverlay" onclick="paikkariOverlayClick(event)">
+  <div id="pk-drawer">
+    <div id="pk-drawer-pill"></div>
+    <div id="pk-header-area" style="display:flex; align-items:center; justify-content:space-between; padding:10px 16px 12px; border-bottom:1px solid #e6dfd8; flex-shrink:0;">
+      <div>
+        <div style="font-size:15px; font-weight:700; color:#141413; font-family:'Noto Serif Bengali',serif; letter-spacing:-0.2px;">সাপ্তাহিক তথ্য হালনাগাদ</div>
+      </div>
+      <button type="button" onclick="paikkariClose()" class="pk-close-btn" style="width:32px;height:32px;border-radius:50%;border:1px solid #e6dfd8;background:#faf9f5;color:#6c6a64;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">×</button>
+    </div>
+    <div id="pk-body">
+<div class="app-shell">
+  <div class="pages-container">
+    <div class="page active" id="page-calc" role="main" aria-label="হিসাব">
+
+      <!-- STEP 1: EXPENSES -->
+      <div id="step1">
+        <div class="settings-group">
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title"><svg aria-hidden="true" focusable="false" class="card-title-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M9.386 9.648A20.4 20.4 0 0 1 24 3.503c11.294 0 20.45 9.155 20.45 20.449S35.294 44.402 24 44.402S3.55 35.246 3.55 23.952c0-3.946 1.119-7.631 3.055-10.756" /><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M30.819 23.824a2.193 2.193 0 0 1-4.387 0v0c0-1.211.982-2.193 2.193-2.193h.001c1.211 0 2.193.982 2.193 2.193" /><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M24.649 17.04h10.71a2.78 2.78 0 0 1 2.786 2.773v8.01a2.78 2.78 0 0 1-2.774 2.785H24.649a2.78 2.78 0 0 1-2.786-2.773v-8.01a2.78 2.78 0 0 1 2.774-2.786z" /><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M35.85 30.562v2.75a2.78 2.78 0 0 1-2.773 2.787H14.41a2.78 2.78 0 0 1-2.786-2.774V14.592a2.78 2.78 0 0 1 2.774-2.786h18.665a2.78 2.78 0 0 1 2.785 2.774v2.504M1.45 16.563l5.395-3.952l.725 6.648" /></svg> Fixed Costs</span>
+              
+            </div>
+            <div class="frow">
+              <span class="flabel">দোকান ভাড়া</span>
+              <div class="finput-wrap">
+                <input type="number" id="yearlyRent" aria-label="দোকান ভাড়া বছরে" placeholder="0" inputmode="numeric" oninput="PK.updateHint()">
+                <span class="funit">৳/বছর</span>
+              </div>
+            </div>
+            <div class="frow">
+              <span class="flabel">বিদ্যুৎ বিল</span>
+              <div class="finput-wrap">
+                <input type="number" id="monthlyElec" aria-label="মাসিক বিদ্যুৎ বিল" placeholder="0" inputmode="numeric" oninput="PK.updateHint()">
+                <span class="funit">৳/মাস</span>
+              </div>
+            </div>
+            <div class="frow">
+              <span class="flabel">ইন্টারনেট বিল</span>
+              <div class="finput-wrap">
+                <input type="number" id="monthlyWifi" aria-label="মাসিক ইন্টারনেট বিল" placeholder="0" inputmode="numeric" oninput="PK.updateHint()">
+                <span class="funit">৳/মাস</span>
+              </div>
+            </div>
+            <div class="frow">
+              <span class="flabel">মাঠ ভাড়া</span>
+              <div class="finput-wrap">
+                <input type="number" id="weeklyMath" aria-label="সাপ্তাহিক মাঠ ভাড়া" placeholder="0" inputmode="numeric" oninput="PK.updateHint()">
+                <span class="funit">৳/সপ্তাহ</span>
+              </div>
+            </div>
+            <div class="frow">
+              <span class="flabel">টয়লেট বিল</span>
+              <div class="finput-wrap">
+                <input type="number" id="weeklyToilet" aria-label="সাপ্তাহিক টয়লেট বিল" placeholder="0" inputmode="numeric" oninput="PK.updateHint()">
+                <span class="funit">৳/সপ্তাহ</span>
+              </div>
+            </div>
+            <div class="frow" style="align-items:flex-start;gap:8px;">
+              <span class="flabel" style="padding-top:6px;">যাকাত</span>
+              <div style="flex:1;font-size:11px;color:var(--text2);line-height:1.6;padding-top:6px;">
+                ২.৫% সম্পত্তি থেকে বিয়োগ হবে
+              </div>
+            </div>
+            <div class="hint" id="fixedHint"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title"><svg aria-hidden="true" focusable="false" class="card-title-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M9.386 9.648A20.4 20.4 0 0 1 24 3.503c11.294 0 20.45 9.155 20.45 20.449S35.294 44.402 24 44.402S3.55 35.246 3.55 23.952c0-3.946 1.119-7.631 3.055-10.756" /><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M30.819 23.824a2.193 2.193 0 0 1-4.387 0v0c0-1.211.982-2.193 2.193-2.193h.001c1.211 0 2.193.982 2.193 2.193" /><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M24.649 17.04h10.71a2.78 2.78 0 0 1 2.786 2.773v8.01a2.78 2.78 0 0 1-2.774 2.785H24.649a2.78 2.78 0 0 1-2.786-2.773v-8.01a2.78 2.78 0 0 1 2.774-2.786z" /><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M35.85 30.562v2.75a2.78 2.78 0 0 1-2.773 2.787H14.41a2.78 2.78 0 0 1-2.786-2.774V14.592a2.78 2.78 0 0 1 2.774-2.786h18.665a2.78 2.78 0 0 1 2.785 2.774v2.504M1.45 16.563l5.395-3.952l.725 6.648" /></svg> Maintenance Costs</span>
+          </div>
+          <div class="frow">
+            <span class="flabel">Salary</span>
+            <div class="finput-wrap">
+              <input type="number" id="salary" aria-label="Salary" placeholder="0" inputmode="numeric">
+              <span class="funit">৳</span>
+            </div>
+          </div>
+          <div class="frow">
+            <span class="flabel">Owner's Salary</span>
+            <div class="finput-wrap">
+              <input type="number" id="ownerSalary" aria-label="Owner's Salary" placeholder="0" inputmode="numeric">
+              <span class="funit">৳</span>
+            </div>
+          </div>
+          <div class="frow">
+            <span class="flabel">ট্রান্সপোর্ট খরচ</span>
+            <div class="finput-wrap">
+              <input type="number" id="transport" aria-label="ট্রান্সপোর্ট খরচ" placeholder="0" inputmode="numeric">
+              <span class="funit">৳</span>
+            </div>
+          </div>
+          <div class="frow">
+            <span class="flabel">যাতায়াত খরচ</span>
+            <div class="finput-wrap">
+              <input type="number" id="vehicle" aria-label="যাতায়াত খরচ" placeholder="0" inputmode="numeric">
+              <span class="funit">৳</span>
+            </div>
+          </div>
+          <div class="frow">
+            <span class="flabel">বিবিধ খরচ</span>
+            <div class="finput-wrap">
+              <input type="number" id="misc" aria-label="বিবিধ খরচ" placeholder="0" inputmode="numeric">
+              <span class="funit">৳</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- STEP 2: STOCK -->
+      <div id="step2">
+
+        <!-- আনুমানিত COGS (প্রাথমিক) -->
+        <div class="settings-group">
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title"><svg aria-hidden="true" focusable="false" class="card-title-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M21 32.167V42.5h-7.333c-3.406 0-6.167-1.761-6.167-5.167s2.76-5.166 6.167-5.166h14.5c6.811 0 12.333-6.523 12.333-13.334S34.978 5.5 28.167 5.5h-14.5A6.167 6.167 0 0 0 7.5 11.666v25.666" /></svg> আনুমানিত COGS</span>
+              
+            </div>
+            <div class="frow">
+              <span class="flabel">বিক্রিত গজ</span>
+              <div class="finput-wrap">
+                <input type="number" id="soldGaj" aria-label="বিক্রিত গজ" placeholder="0" inputmode="decimal" oninput="PK.updateEstCOGS()">
+                <span class="funit">গজ</span>
+              </div>
+            </div>
+            <div class="frow">
+              <span class="flabel">প্রতি গজে লাভ</span>
+              <div class="finput-wrap">
+                <input type="number" id="profitGaj" aria-label="প্রতি গজে লাভ" placeholder="0" inputmode="decimal" oninput="PK.updateEstCOGS()">
+                <span class="funit">৳/গজ</span>
+              </div>
+            </div>
+            <div class="frow">
+              <span class="flabel flabel-auto">আনুমানিক মোট লাভ</span>
+              <div class="fauto" id="estProfitAuto">—</div>
+            </div>
+          </div>
+        </div>
+        <!-- ক্ষতিগ্রস্ত/নষ্ট মাল -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">লোকসান মাল</span>
+            
+          </div>
+          <div class="frow">
+            <span class="flabel">নষ্ট / ক্ষতিগ্রস্ত মালের মূল্য</span>
+            <div class="finput-wrap">
+              <input type="number" id="stockLoss" aria-label="লোকসান মাল" placeholder="0" inputmode="numeric">
+              <span class="funit">৳</span>
+            </div>
+          </div>
+        </div>
+        <!-- Stock অডিট (ঐচ্ছিক) -->
+        <div class="settings-group">
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title"><svg aria-hidden="true" focusable="false" class="card-title-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M6 20q-1.25 0-2.125-.875T3 17V8h18v9q0 1.25-.875 2.125T18 20zM3 7V5h6V4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4v1h6v2z" /></svg> প্রকৃত COGS (অডিট)</span>
+              <span class="cbadge purple">ঐচ্ছিক</span>
+            </div>
+            <div class="frow">
+              <span class="flabel">পূর্বের মজুদ</span>
+              <div class="finput-wrap">
+                <input type="number" id="openingStock" aria-label="পূর্বের মজুদ" placeholder="0" inputmode="numeric" oninput="PK.updateActualCOGS()">
+                <span class="funit">৳</span>
+              </div>
+            </div>
+            <div class="frow">
+              <span class="flabel">এই সপ্তাহে ক্রয়</span>
+              <div class="finput-wrap">
+                <input type="number" id="auditPurchase" aria-label="অডিট ক্রয়" placeholder="0" inputmode="numeric" oninput="PK.updateActualCOGS()">
+                <span class="funit">৳</span>
+              </div>
+            </div>
+            <div class="frow">
+              <span class="flabel">অবিক্রীত মাল</span>
+              <div class="finput-wrap">
+                <input type="number" id="closingStock" aria-label="অবিক্রীত মাল" placeholder="0" inputmode="numeric" oninput="PK.updateActualCOGS()">
+                <span class="funit">৳</span>
+              </div>
+            </div>
+            <div class="frow">
+              <span class="flabel flabel-auto">প্রকৃত COGS (অডিট)</span>
+              <div class="fauto" id="cogsAuto">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: SALES & PURCHASE -->
+      <div id="validation-error" style="display:none;background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.22);border-radius:10px;padding:11px 14px;margin-bottom:10px;font-size:13px;color:#b91c1c;font-weight:600;line-height:1.5;"></div>
+      <div id="step3">
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title"><svg aria-hidden="true" focusable="false" class="card-title-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M22.677 15.118c-.812-1.232-5.09-5.42-6.162-6.552c-1.673-1.774-2.826-3.748-5.01-4.238c-1.372-.321-8.316.54-7.214 1.683a.35.35 0 0 0 .501 0c.481-.471 3.898-.932 6.533-.832a5.77 5.77 0 0 1 2.935 2.315c1.453 1.823 6.623 7.193 7.304 8.115q.182.271.311.571a25.8 25.8 0 0 1-4.94 5.57a6.3 6.3 0 0 1-2.214 1.183a47 47 0 0 1-4.338-3.707a69 69 0 0 1-4.629-5.12a6 6 0 0 1-1.062-3.486a.31.31 0 0 0-.621 0c.13 2.825.731 3.526 2.555 5.71a40.8 40.8 0 0 0 6.933 7.014a1.58 1.58 0 0 0 1.824.561c2.615-.802 5.57-4.599 7.073-6.512c.561-.732.922-1.183.22-2.275" /><path d="M8.72 9.758c.38-1.062.49-1.643-.37-2.315a2.204 2.204 0 0 0-3.207.401A8.4 8.4 0 0 1 2.879 5.84C1.716 4.538.594 2.364 1.897 1.232c.55-.491 1.523-.23 2.475.33c2.194 1.253 2.114 2.565 2.715 2.204c.841-.51-1.764-2.765-2.866-3.316C1.626-.862-.127.901.164 3.095c.36 2.665 2.474 4.469 4.819 5.63c.46 2.947 3.366 2.105 3.737 1.033m-.4-.872a1.293 1.293 0 0 1-2.546.13c.441.16.842.16.882-.1s-.521-.54-.912-.751c1.122-1.343 2.816-.1 2.575.721m14.768-2.254c-3.556-1.533-2.595-1.112-7.564-2.465c-.08 0-.591-.25-.872-.06a.34.34 0 0 0 .17.581q1.027.3 2.004.732a47 47 0 0 0 5.741 2.224c.832.37-.55 3.316-.54 4.007a.35.35 0 0 0 .7 0c.03-.831 2.295-3.957.361-5.02M9.842 12.243a.6.6 0 0 1-.3-.451a.371.371 0 1 0-.732 0a1.37 1.37 0 0 0 .792 1.392a1.263 1.263 0 0 0 1.673-.63c.13-.23.201-.488.21-.752a1.9 1.9 0 0 0-.11-.672c-.25-.69-.611-1.152.47-.29a.331.331 0 0 0 .522-.39c-.631-.792-1.383-1.494-2.134-.672a1.28 1.28 0 0 0-.26 1.002c0 .33.21.631.26 1.002a.53.53 0 0 1 0 .3c-.11.14-.24.25-.391.16m3.998-.701q-.351 0-.682.12a2.5 2.5 0 0 0-.821.502q-.428.42-.802.891l-.47.541l-.532.641a.33.33 0 0 0 .471.451l.611-.53l.14-.11v.1a.6.6 0 0 0 .28.3c.161.1.302.13.462.22c-.23.23-.47.481-.691.682a.373.373 0 1 0 .47.58c.452-.32 1.003-.69 1.464-1.101q.512-.445.901-1.002c.198-.364.279-.78.23-1.193a1.34 1.34 0 0 0-.46-.921a1.14 1.14 0 0 0-.571-.17m-.14 1.734a4.4 4.4 0 0 1-.602.871a2.2 2.2 0 0 0-.15-.47a.76.76 0 0 0-.28-.331c.12-.1.24-.2.37-.29c.13-.091 1.182-.762.661.22m1.654 1.211l-1.413 1.002a3.8 3.8 0 0 0-.731.821a1.16 1.16 0 0 0 0 1.063l.23.4l.33.391a.37.37 0 0 0 .572-.47l-.13-.322l-.1-.34v-.1c0-.03.14-.13.21-.2l.45-.422l1.002-1.372a.33.33 0 1 0-.45-.471zm1.753 2.825l.15.22q.094.099.2.181c.812.641.942.571 1.093.461c.15-.11.32-.15-.17-1.192a1.4 1.4 0 0 0-.161-.26a1.2 1.2 0 0 0-.23-.211c-.812-.541-1.002-.431-2.165.5c-.13.101-.22.231-.34.341c-.13.13-.27.25-.391.391q-.185.251-.32.531c-.09.191-.13.4-.12.611c.023.248.11.486.25.692c.13.18.791 1.002 1.162.58c.37-.42-.11-.52-.31-.951a.56.56 0 0 1 0-.32l.2-.221l.1.08c.811.511.942.42 1.072.3s.24-.26-.21-1.101a.8.8 0 0 0-.15-.21l.38-.462a.08.08 0 0 1-.04.04" /></g></svg> Sale</span>
+          </div>
+          <div class="frow">
+            <span class="flabel">নগদে বিক্রি</span>
+            <div class="finput-wrap">
+              <input type="number" id="cashSale" aria-label="নগদে বিক্রি" placeholder="0" inputmode="numeric" oninput="PK.updateTotalSale(); updateEstCOGS();">
+              <span class="funit">৳</span>
+            </div>
+          </div>
+          <div class="frow">
+            <span class="flabel">বাকিতে বিক্রি</span>
+            <div class="finput-wrap">
+              <input type="number" id="creditSale" aria-label="বাকিতে বিক্রি" placeholder="0" inputmode="numeric" oninput="PK.updateTotalSale(); updateEstCOGS();">
+              <span class="funit">৳</span>
+            </div>
+          </div>
+          <div class="frow">
+            <span class="flabel flabel-auto">মোট বিক্রি (স্বয়ংক্রিয়)</span>
+            <div class="fauto" id="totalSaleAuto">—</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title"><svg aria-hidden="true" focusable="false" class="card-title-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M7 18c1.1 0 2 .9 2 2s-.9 2-2 2s-2-.9-2-2s.9-2 2-2m10 0c1.1 0 2 .9 2 2s-.9 2-2 2s-2-.9-2-2s.9-2 2-2m-9.8-3.2c0 .1.1.2.2.2H19v2H7c-1.1 0-2-.9-2-2c0-.4.1-.7.2-1l1.3-2.4L3 4H1V2h3.3l4.3 9h7l3.9-7l1.7 1l-3.9 7c-.3.6-1 1-1.7 1H8.1l-.9 1.6zM9.4 1c.8 0 1.4.6 1.4 1.4s-.6 1.4-1.4 1.4S8 3.2 8 2.4S8.7 1 9.4 1m5.2 8c-.8 0-1.4-.6-1.4-1.4s.6-1.4 1.4-1.4s1.4.6 1.4 1.4S15.3 9 14.6 9M9.2 9L8 7.8L14.8 1L16 2.2z" /></svg> Purchase</span>
+          </div>
+          <div class="frow">
+            <span class="flabel">নগদে ক্রয়</span>
+            <div class="finput-wrap">
+              <input type="number" id="cashPurchase" aria-label="নগদে ক্রয়" placeholder="0" inputmode="numeric">
+              <span class="funit">৳</span>
+            </div>
+          </div>
+          <div class="frow">
+            <span class="flabel">বাকিতে ক্রয়</span>
+            <div class="finput-wrap">
+              <input type="number" id="creditPurchase" aria-label="বাকিতে ক্রয়" placeholder="0" inputmode="numeric">
+              <span class="funit">৳</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title"><svg aria-hidden="true" focusable="false" class="card-title-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><circle cx="24" cy="24" r="11" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" /><circle cx="35.49" cy="12.51" r="5.273" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" /><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M35 24h10.5A21.499 21.499 0 0 1 8.798 39.202A21.5 21.5 0 0 1 24 2.5V13" /></svg> আদায় &amp; দেনা</span>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0; border-top:1px solid var(--border2);">
+            <div style="padding:10px 12px; border-right:1px solid var(--border2);">
+              <div class="section-label-sm">পাওনা আদায়</div>
+              <div class="finput-wrap">
+                <input type="number" id="oldCollection" aria-label="পাওনা আদায়" placeholder="0" inputmode="numeric">
+                <span class="funit">৳</span>
+              </div>
+            </div>
+            <div style="padding:10px 12px;">
+              <div class="section-label-sm">বকেয়া পরিশোধ</div>
+              <div class="finput-wrap">
+                <input type="number" id="oldDebt" aria-label="বকেয়া পরিশোধ" placeholder="0" inputmode="numeric">
+                <span class="funit">৳</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:8px; justify-content:flex-end;">
+          <button type="button" class="btn-primary" onclick="PK.calculate()" aria-label="হিসাব করুন এবং ফলাফল দেখুন">
+            <svg aria-hidden="true" focusable="false" class="card-title-icon icon-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 15">
+	<path fill="currentColor" d="M3 0c-.55 0-1 .45-1 1v13c0 .55.45 1 1 1h10v-1l-.75-.75l.75-.75V.5c0-.28-.22-.5-.5-.5Zm4.5 2.5c.5 0 .5.5.5.5l1.88.5V4L11 6.5c0 .5-.39 1-1.25 1S8.5 7 8.5 6.5L9.62 4H8v5h2l.5.5h-6L5 9h2V4H5.38L6.5 6.5c0 .5-.4 1-1.25 1S4 7 4 6.5L5.12 4v-.5L7 3s0-.5.5-.5m-2.25 2l-.58 2h1.15Zm4.5 0l-.57 2h1.15ZM3 12.5h9l-.75.75l.75.75H3Z" />
+</svg> হিসাব করুন
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /page-calc -->
+
+    <div class="page" id="page-result" role="main" aria-label="ফলাফল">
+
+      <!-- Empty state -->
+      <div id="result-empty" class="empty-result">
+        <div class="empty-result-icon"><svg aria-hidden="true" focusable="false" style="width:48px;height:48px;display:inline-block;vertical-align:middle;flex-shrink:0;opacity:0.2;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" fill-rule="evenodd" d="M64 64h64v298.667H64zm106.667 149.333h64v149.334h-64zM448 170.667h-64v192h64zm-170.667-64h64v256h-64zM448 405.333H64V448h384z" clip-rule="evenodd" /></svg></div>
+        <div class="empty-result-title">এখনো কোনো ফলাফল নেই</div>
+        <div class="empty-result-sub">হিসাব পেজে তথ্য দিয়ে "হিসাব করুন" বাটনে চাপুন</div>
+        <button type="button" class="btn-go-calc" onclick="goToPage('calc')">হিসাব করতে যান →</button>
+      </div>
+
+      <!-- Results content -->
+      <div id="result-content" style="display:none;">
+
+        <!-- RADIAL PROGRESS -->
+        <div class="animate-in" style="display:flex;justify-content:space-around;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 10px;margin-bottom:10px;">
+          <div class="radial-wrap">
+            <svg width="64" height="64" viewBox="0 0 64 64">
+              <circle cx="32" cy="32" r="26" fill="none" stroke="var(--color-base-300)" stroke-width="5"/>
+              <circle id="radialProfitArc" cx="32" cy="32" r="26" fill="none" stroke="var(--color-primary)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="163.4" transform="rotate(-90 32 32)" style="transition:stroke-dashoffset 0.6s ease;"/>
+              <text id="radialProfitTxt" x="32" y="36" text-anchor="middle" font-size="11" font-weight="700" fill="var(--color-primary)">0%</text>
+            </svg>
+            <span class="radial-label">নিট মার্জিন</span>
+          </div>
+          <div class="radial-wrap">
+            <svg width="64" height="64" viewBox="0 0 64 64">
+              <circle cx="32" cy="32" r="26" fill="none" stroke="var(--color-base-300)" stroke-width="5"/>
+              <circle id="radialGrossArc" cx="32" cy="32" r="26" fill="none" stroke="var(--color-secondary)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="163.4" transform="rotate(-90 32 32)" style="transition:stroke-dashoffset 0.6s ease;"/>
+              <text id="radialGrossTxt" x="32" y="36" text-anchor="middle" font-size="11" font-weight="700" fill="var(--color-secondary)">0%</text>
+            </svg>
+            <span class="radial-label">গ্রস মার্জিন</span>
+          </div>
+          <div class="radial-wrap">
+            <svg width="64" height="64" viewBox="0 0 64 64">
+              <circle cx="32" cy="32" r="26" fill="none" stroke="var(--color-base-300)" stroke-width="5"/>
+              <circle id="radialCashArc" cx="32" cy="32" r="26" fill="none" stroke="var(--color-accent)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="163.4" transform="rotate(-90 32 32)" style="transition:stroke-dashoffset 0.6s ease;"/>
+              <text id="radialCashTxt" x="32" y="36" text-anchor="middle" font-size="11" font-weight="700" fill="var(--color-accent)">0%</text>
+            </svg>
+            <span class="radial-label">নগদ অনুপাত</span>
+          </div>
+        </div>
+
+        <!-- RESULT ট্যাব বার — P&L / রাজস্ব / ক্যাশফ্লো / স্টক -->
+        <div class="result-tab-bar animate-in">
+          <button type="button" class="rc-card rc-active" id="rcCard1" onclick="switchResultCard(1)">
+            <span class="rc-label">P&amp;L বিবরণী</span>
+          </button>
+          <button type="button" class="rc-card" id="rcCard2" onclick="switchResultCard(2)">
+            <span class="rc-label">রাজস্ব বিশ্লেষণ</span>
+          </button>
+          <button type="button" class="rc-card" id="rcCard3" onclick="switchResultCard(3)">
+            <span class="rc-label">ক্যাশফ্লো</span>
+          </button>
+          <button type="button" class="rc-card" id="rcCard4" onclick="switchResultCard(4)">
+            <span class="rc-label">Stock অডিট</span>
+          </button>
+        </div>
+
+        <!-- PANEL 1: P&L বিবরণী -->
+        <div class="rc-panel rc-open" id="rcPanel1">
+          <div style="height:8px;"></div>
+
+            <!-- Revenue Accordion -->
+            <div class="acc-card" id="accRevenue">
+              <div class="acc-header" onclick="toggleAcc('accRevenue')">
+                <div class="acc-left">
+                  <div class="acc-icon-wrap ic-revenue"></div>
+                  <div class="acc-titles">
+                    <div class="acc-title-main">মোট রাজস্ব <span class="pl-sub-label-bold">Total Revenue</span></div>
+                    <div class="acc-title-sub" id="accRevenueSub">▼ বিস্তারিত দেখুন</div>
+                  </div>
+                </div>
+                <div class="acc-right">
+                  <span class="acc-tag tag-revenue">REVENUE</span>
+                  <span class="acc-total tc-revenue" id="accRevTotal">—</span>
+                  <span class="acc-chevron">▼</span>
+                </div>
+              </div>
+              <div class="acc-body">
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-plus">+</span><span class="acc-row-label">নগদ বিক্রয় <em class="pl-sub-label">Cash Sales</em></span></div>
+                  <span class="acc-row-val v-green" id="rvCashSale">—</span>
+                </div>
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-plus">+</span><span class="acc-row-label">বাকি বিক্রয় / প্রাপ্য হিসাব <em class="pl-sub-label">Credit Sales (A/R)</em></span><span class="acc-note n-warning" id="rvCreditNote"></span></div>
+                  <span class="acc-row-val v-amber" id="rvCreditSale">—</span>
+                </div>
+                <div class="acc-row acc-total-row">
+                  <div class="acc-row-left"><span class="acc-row-label"><strong>মোট রাজস্ব (Total Revenue)</strong></span></div>
+                  <span class="acc-row-val bold v-green" id="rvTotalSale">—</span>
+                </div>
+                <div class="acc-analytics-box">
+                  <div class="acc-analytics-title">Sales Analysis · বিক্রয় বিশ্লেষণ</div>
+                  <div class="acc-analytics-row"><span>নগদ বিক্রয় অনুপাত (Cash Ratio)</span><span id="rvCashPct">—</span></div>
+                  <div class="acc-analytics-row"><span>বাকি বিক্রয় অনুপাত (Credit Ratio)</span><span class="amber" id="rvCreditPct">—</span></div>
+                  <div class="acc-analytics-row"><span>গড় লাভ/গজ (Avg Profit per Yard)</span><span id="rvAvgPerGaj">—</span></div>
+                  <div class="acc-analytics-row"><span>বিক্রিত গজ (Units Sold)</span><span id="rvSoldGaj">—</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- COGS Accordion -->
+            <div class="acc-card" id="accCogs">
+              <div class="acc-header" onclick="toggleAcc('accCogs')">
+                <div class="acc-left">
+                  <div class="acc-icon-wrap ic-cogs"></div>
+                  <div class="acc-titles">
+                    <div class="acc-title-main">পণ্য বিক্রয় ব্যয় <span class="pl-sub-label-bold">COGS</span></div>
+                    <div class="acc-title-sub" id="accCogsSub">▼ গজ-ভিত্তিক আনুমানিক পদ্ধতি</div>
+                  </div>
+                </div>
+                <div class="acc-right">
+                  <span class="acc-tag tag-cogs">COGS</span>
+                  <span class="acc-total tc-cogs" id="accCogsTotal">—</span>
+                  <span class="acc-chevron">▼</span>
+                </div>
+              </div>
+              <div class="acc-body">
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-delta">×</span><span class="acc-row-label">বিক্রিত গজ × প্রতি গজ মুনাফা <em class="pl-sub-label">Yard-Based Method</em></span></div>
+                  <span class="acc-row-val v-neutral" id="pEstProfit">—</span>
+                </div>
+                <div class="acc-row" id="stockLossRow" style="display:none;">
+                  <div class="acc-row-left"><span class="acc-sign s-minus">−</span><span class="acc-row-label">মজুদ সংকোচন / ক্ষতিলোপ <em class="pl-sub-label">Inventory Write-off</em></span></div>
+                  <span class="acc-row-val v-amber" id="pStockLoss">—</span>
+                </div>
+                <div class="acc-row acc-total-row">
+                  <div class="acc-row-left"><span class="acc-row-label"><strong>আনুমানিত পণ্য বিক্রয় ব্যয় (Est. COGS)</strong></span></div>
+                  <span class="acc-row-val bold v-red" id="pCOGS">—</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Gross Profit Net Row -->
+            <div class="acc-net-row animate-in" style="border-radius:12px;margin-bottom:8px;">
+              <span class="acc-net-label">স্থূল মুনাফা <span style="font-size:11px;font-weight:500;color:var(--text3);">Gross Profit</span></span>
+              <span class="acc-net-val" id="pGross">—</span>
+            </div>
+
+            <!-- OPEX Accordion -->
+            <div class="acc-card" id="accOpex">
+              <div class="acc-header" onclick="toggleAcc('accOpex')">
+                <div class="acc-left">
+                  <div class="acc-icon-wrap ic-opex"></div>
+                  <div class="acc-titles">
+                    <div class="acc-title-main">পরিচালন ব্যয় <span class="pl-sub-label-bold">OPEX</span></div>
+                    <div class="acc-title-sub" id="accOpexSub">▼ Variable, Period-Based Costs</div>
+                  </div>
+                </div>
+                <div class="acc-right">
+                  <span class="acc-tag tag-opex">OPEX</span>
+                  <span class="acc-total tc-opex" id="accOpexTotal">—</span>
+                  <span class="acc-chevron">▼</span>
+                </div>
+              </div>
+              <div class="acc-body">
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-minus">−</span><span class="acc-row-label">কর্মচারী বেতন ব্যয় <em class="pl-sub-label">Employee Payroll Expense</em></span></div>
+                  <span class="acc-row-val v-red" id="pSalary">—</span>
+                </div>
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-minus">−</span><span class="acc-row-label">মালিকানা আরোপিত বেতন <em class="pl-sub-label">Owner's Imputed Salary</em></span></div>
+                  <span class="acc-row-val v-red" id="pOwnerSalary">—</span>
+                </div>
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-minus">−</span><span class="acc-row-label">পণ্য পরিবহন ব্যয় <em class="pl-sub-label">Freight &amp; Handling Expense</em></span></div>
+                  <span class="acc-row-val v-red" id="pTransport">—</span>
+                </div>
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-minus">−</span><span class="acc-row-label">ভ্রমণ ও যাতায়াত ব্যয় <em class="pl-sub-label">Travel &amp; Conveyance Expense</em></span></div>
+                  <span class="acc-row-val v-red" id="pVehicle">—</span>
+                </div>
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-minus">−</span><span class="acc-row-label">অন্যান্য পরিচালন ব্যয় <em class="pl-sub-label">Misc. Operating Expenses</em></span></div>
+                  <span class="acc-row-val v-red" id="pMisc">—</span>
+                </div>
+                <div class="acc-row acc-total-row">
+                  <div class="acc-row-left"><span class="acc-row-label"><strong>মোট পরিচালন ব্যয়</strong></span></div>
+                  <span class="acc-row-val bold v-red" id="accOpexTotalRow">—</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Fixed Overhead Accordion -->
+            <div class="acc-card" id="accFixed">
+              <div class="acc-header" onclick="toggleAcc('accFixed')">
+                <div class="acc-left">
+                  <div class="acc-icon-wrap ic-fixed"></div>
+                  <div class="acc-titles">
+                    <div class="acc-title-main">স্থির উপরিব্যয় <span class="pl-sub-label-bold">Fixed Overhead</span></div>
+                    <div class="acc-title-sub" id="accFixedSub">▼ সাপ্তাহিক বরাদ্দ (Weekly Allocation)</div>
+                  </div>
+                </div>
+                <div class="acc-right">
+                  <span class="acc-tag tag-fixed">FIXED</span>
+                  <span class="acc-total tc-fixed" id="accFixedTotal">—</span>
+                  <span class="acc-chevron">▼</span>
+                </div>
+              </div>
+              <div class="acc-body">
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-minus">−</span><span class="acc-row-label">দোকান দখল ব্যয় <em class="pl-sub-label">Shop Rent / Occupancy (÷52)</em></span></div>
+                  <span class="acc-row-val v-purple" id="pRent">—</span>
+                </div>
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-minus">−</span><span class="acc-row-label">বিদ্যুৎ ও ইউটিলিটি ব্যয় <em class="pl-sub-label">Electricity / Utility (÷4.33)</em></span></div>
+                  <span class="acc-row-val v-purple" id="pElec">—</span>
+                </div>
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-minus">−</span><span class="acc-row-label">টেলিযোগাযোগ ব্যয় <em class="pl-sub-label">Telecom &amp; Internet (÷4.33)</em></span></div>
+                  <span class="acc-row-val v-purple" id="pWifi">—</span>
+                </div>
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-minus">−</span><span class="acc-row-label">বাজার স্টল ভাড়া <em class="pl-sub-label">Market Stall / Bazaar Rent</em></span></div>
+                  <span class="acc-row-val v-purple" id="pMath">—</span>
+                </div>
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-minus">−</span><span class="acc-row-label">পয়ঃনিষ্কাশন সুবিধা ব্যয় <em class="pl-sub-label">Sanitation &amp; Facility Fee</em></span></div>
+                  <span class="acc-row-val v-purple" id="pToilet">—</span>
+                </div>
+                <div class="acc-row" id="zakatRow" style="display:none;">
+                  <div class="acc-row-left"><span class="acc-sign s-minus">−</span><span class="acc-row-label">যাকাত <em class="pl-sub-label">(মজুদ + আয়) × ২.৫% ÷ ৫২</em></span></div>
+                  <span class="acc-row-val v-purple" id="pZakat">—</span>
+                </div>
+                <div class="acc-row acc-total-row">
+                  <div class="acc-row-left"><span class="acc-row-label"><strong>মোট স্থির উপরিব্যয়</strong></span></div>
+                  <span class="acc-row-val bold v-purple" id="accFixedTotalRow">—</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- NET PROFIT Final Row -->
+            <div class="acc-net-row animate-in" style="border-radius:12px;margin-bottom:12px;">
+              <span class="acc-net-label" style="font-size:15px;">নিট মুনাফা <span style="font-size:11px;font-weight:500;color:var(--text3);">Net Profit / Net Income</span></span>
+              <span class="acc-net-val" id="pNet">—</span>
+            </div>
+
+        </div><!-- /rcPanel1 -->
+
+        <!-- PANEL 2: রাজস্ব বিশ্লেষণ -->
+        <div class="rc-panel" id="rcPanel2">
+          <div style="height:8px;"></div>
+
+            <div class="acc-card open" id="accRevDetail">
+              <div class="acc-header" onclick="toggleAcc('accRevDetail')" style="background:rgba(74,222,128,0.05);">
+                <div class="acc-left">
+                  <div class="acc-icon-wrap ic-revenue"></div>
+                  <div class="acc-titles">
+                    <div class="acc-title-main">মোট রাজস্ব বিশ্লেষণ</div>
+                    <div class="acc-title-sub">Total Revenue Breakdown</div>
+                  </div>
+                </div>
+                <div class="acc-right">
+                  <span class="acc-tag tag-revenue">REVENUE</span>
+                  <span class="acc-total tc-revenue" id="accRevDetailTotal">—</span>
+                  <span class="acc-chevron" style="transform:rotate(180deg);">▼</span>
+                </div>
+              </div>
+              <div class="acc-body" style="display:block;">
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-plus">+</span><span class="acc-row-label">নগদ বিক্রয় (Cash Sales)</span></div>
+                  <span class="acc-row-val v-green" id="rvCashSale2">—</span>
+                </div>
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-plus">+</span><span class="acc-row-label">বাকি বিক্রয় / প্রাপ্য হিসাব (Credit Sales A/R)</span><span class="acc-note n-warning" id="rvCreditNote2"></span></div>
+                  <span class="acc-row-val v-amber" id="rvCreditSale2">—</span>
+                </div>
+                <div class="acc-row acc-total-row">
+                  <div class="acc-row-left"><span class="acc-row-label"><strong>মোট রাজস্ব</strong></span></div>
+                  <span class="acc-row-val bold v-green" id="rvTotalSale2">—</span>
+                </div>
+                <div class="acc-analytics-box">
+                  <div class="acc-analytics-title">Sales Analysis · বিক্রয় বিশ্লেষণ</div>
+                  <div class="acc-analytics-row"><span>নগদ বিক্রয় অনুপাত</span><span id="rvCashPct2">—</span></div>
+                  <div class="acc-analytics-row"><span>বাকি বিক্রয় অনুপাত (Receivables)</span><span class="amber" id="rvCreditPct2">—</span></div>
+                  <div class="acc-analytics-row"><span>গড় লাভ/গজ (Avg Yield per Yard)</span><span id="rvAvgPerGaj2">—</span></div>
+                  <div class="acc-analytics-row"><span>বিক্রিত গজ (Units Sold)</span><span id="rvSoldGaj2">—</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="acc-card" id="accCogsDetail">
+              <div class="acc-header" onclick="toggleAcc('accCogsDetail')">
+                <div class="acc-left">
+                  <div class="acc-icon-wrap ic-cogs"></div>
+                  <div class="acc-titles">
+                    <div class="acc-title-main">পণ্য বিক্রয় ব্যয় বাদ (COGS Deduction)</div>
+                    <div class="acc-title-sub">▼ বিস্তারিত দেখুন</div>
+                  </div>
+                </div>
+                <div class="acc-right">
+                  <span class="acc-tag tag-cogs">COGS</span>
+                  <span class="acc-total tc-cogs" id="accCogsDetailTotal">—</span>
+                  <span class="acc-chevron">▼</span>
+                </div>
+              </div>
+              <div class="acc-body">
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-minus">−</span><span class="acc-row-label">আনুমানিত পণ্য বিক্রয় ব্যয় (Est. COGS)</span></div>
+                  <span class="acc-row-val v-red" id="rvCOGS">—</span>
+                </div>
+                <div class="acc-row acc-total-row">
+                  <div class="acc-row-left"><span class="acc-row-label"><strong>স্থূল মুনাফা (Gross Profit)</strong></span></div>
+                  <span class="acc-row-val bold" id="rvGross">—</span>
+                </div>
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-minus">−</span><span class="acc-row-label">মোট পরিচালন + স্থির ব্যয় (Total OPEX + Fixed Overhead)</span></div>
+                  <span class="acc-row-val v-red" id="rvTotalExp">—</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="acc-net-row animate-in" style="border-radius:12px;margin-bottom:12px;">
+              <span class="acc-net-label" style="font-size:15px;">নিট মুনাফা (Net Profit)</span>
+              <span class="acc-net-val" id="rvNetProfit">—</span>
+            </div>
+
+        </div><!-- /rcPanel2 -->
+
+        <!-- PANEL 3: ক্যাশফ্লো -->
+        <div class="rc-panel" id="rcPanel3">
+          <div style="height:8px;"></div>
+
+            <!-- Cash Inflow -->
+            <div class="acc-card open" id="accCashIn">
+              <div class="acc-header" onclick="toggleAcc('accCashIn')" style="background:rgba(56,189,248,0.05);">
+                <div class="acc-left">
+                  <div class="acc-icon-wrap ic-cash"></div>
+                  <div class="acc-titles">
+                    <div class="acc-title-main">পরিচালন In Flow</div>
+                    <div class="acc-title-sub">Cash Inflow from Operating Activities</div>
+                  </div>
+                </div>
+                <div class="acc-right">
+                  <span class="acc-tag tag-cash">INFLOW</span>
+                  <span class="acc-total tc-cash" id="cfTotalInHeader">—</span>
+                  <span class="acc-chevron" style="transform:rotate(180deg);">▼</span>
+                </div>
+              </div>
+              <div class="acc-body" style="display:block;">
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-plus">+</span><span class="acc-row-label">নগদ বিক্রয় (Cash Sales)</span></div>
+                  <span class="acc-row-val v-green" id="cfCashSale">—</span>
+                </div>
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-plus">+</span><span class="acc-row-label">বিগত কালীন প্রাপ্য আদায় <em class="pl-sub-label">Prior Period A/R Collection</em></span></div>
+                  <span class="acc-row-val v-blue" id="cfOldCollection">—</span>
+                </div>
+                <div class="acc-row acc-total-row">
+                  <div class="acc-row-left"><span class="acc-row-label"><strong>মোট In Flow (Total Cash Inflow)</strong></span></div>
+                  <span class="acc-row-val bold v-green" id="cfTotalIn">—</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cash Outflow -->
+            <div class="acc-card open" id="accCashOut">
+              <div class="acc-header" onclick="toggleAcc('accCashOut')" style="background:rgba(251,146,60,0.05);">
+                <div class="acc-left">
+                  <div class="acc-icon-wrap ic-cogs"></div>
+                  <div class="acc-titles">
+                    <div class="acc-title-main">পরিচালন Out Flow</div>
+                    <div class="acc-title-sub">Cash Outflow from Operating Activities</div>
+                  </div>
+                </div>
+                <div class="acc-right">
+                  <span class="acc-tag tag-cogs">OUTFLOW</span>
+                  <span class="acc-total tc-cogs" id="cfTotalOutHeader">—</span>
+                  <span class="acc-chevron" style="transform:rotate(180deg);">▼</span>
+                </div>
+              </div>
+              <div class="acc-body" style="display:block;">
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-minus">−</span><span class="acc-row-label">নগদ ক্রয় (Cash Purchases)</span></div>
+                  <span class="acc-row-val v-red" id="cfCashPurchase">—</span>
+                </div>
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-minus">−</span><span class="acc-row-label">বিগত কালীন দেয় পরিশোধ <em class="pl-sub-label">Prior Period A/P Settlement</em></span></div>
+                  <span class="acc-row-val v-red" id="cfOldDebt">—</span>
+                </div>
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-minus">−</span><span class="acc-row-label">পরিচালন ব্যয় (OPEX)</span></div>
+                  <span class="acc-row-val v-red" id="cfOpex">—</span>
+                </div>
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-minus">−</span><span class="acc-row-label">স্থির উপরিব্যয় (Fixed Overhead)</span></div>
+                  <span class="acc-row-val v-red" id="cfFixed">—</span>
+                </div>
+                <div class="acc-row acc-total-row">
+                  <div class="acc-row-left"><span class="acc-row-label"><strong>মোট Out Flow (Total Cash Outflow)</strong></span></div>
+                  <span class="acc-row-val bold v-red" id="cfTotalOut">—</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Net Cashflow -->
+            <div class="acc-net-row animate-in" style="border-radius:12px;margin-bottom:8px;">
+              <span class="acc-net-label" style="font-size:15px;">নিট ক্যাশফ্লো <span style="font-size:11px;font-weight:500;color:var(--text3);">Net Cash Flow</span></span>
+              <span class="acc-net-val" id="cfNet">—</span>
+            </div>
+
+            <!-- Accrual Reconciliation -->
+            <div class="acc-diff-box">
+              <div class="acc-diff-title">Accrual Reconciliation — প্রফিট ≠ ক্যাশফ্লো কারণ বিশ্লেষণ</div>
+              <div class="acc-diff-row"><span>বাকি বিক্রয় (A/R — নগদ আসেনি)</span><span id="diffCreditSale" style="color:#b45309;">—</span></div>
+              <div class="acc-diff-row"><span>বাকি ক্রয় (A/P — নগদ যায়নি)</span><span id="diffCreditPurchase" style="color:var(--color-secondary);">—</span></div>
+              <div class="acc-diff-row"><span>পাওনা আদায় (Prior A/R collected)</span><span id="diffOldCollection" style="color:#16a34a;">—</span></div>
+              <div class="acc-diff-row"><span>বকেয়া পরিশোধ (Prior A/P settled)</span><span id="diffOldDebt" style="color:#dc2626;">—</span></div>
+            </div>
+
+        </div><!-- /rcPanel3 -->
+
+        <!-- PANEL 4: Stock অডিট -->
+        <div class="rc-panel" id="rcPanel4">
+          <div style="height:8px;"></div>
+
+            <!-- COGS Variance Alert -->
+            <div id="alertVariance" class="alert-banner ab-warning" style="display:none;margin-bottom:8px;">
+              <div class="ab-icon"></div>
+              <div class="ab-body">
+                <div><span class="ab-sev-badge">COGS VARIANCE &gt; 10%</span></div>
+                <div class="ab-title">পণ্য ব্যয় পার্থক্য সতর্কতা</div>
+                <div class="ab-desc">Stock অডিটের প্রকৃত COGS এবং গজ-পদ্ধতির আনুমানিত COGS-এর মধ্যে উল্লেখযোগ্য পার্থক্য।</div>
+                <div class="ab-action">১. গজ হিসাব পুনরায় যাচাই করুন ২. Opening/Closing Stock সঠিক কিনা দেখুন</div>
+              </div>
+              <button type="button" class="ab-close" onclick="dismissAlert('alertVariance')">×</button>
+            </div>
+
+            <!-- Inventory Shrinkage Alert -->
+            <div id="alertShrinkage" class="alert-banner ab-orange" style="display:none;margin-bottom:8px;">
+              <div class="ab-icon"></div>
+              <div class="ab-body">
+                <div><span class="ab-sev-badge">SHRINKAGE &gt; 3%</span></div>
+                <div class="ab-title">মজুদ সংকোচন — Inventory Shrinkage</div>
+                <div class="ab-desc">মোট বিক্রয়ের ৩%-এর বেশি মাল নষ্ট বা লোকসান — ব্যবসায়িক সমস্যার ইঙ্গিত।</div>
+              </div>
+              <button type="button" class="ab-close" onclick="dismissAlert('alertShrinkage')">×</button>
+            </div>
+
+            <!-- Estimated COGS -->
+            <div class="acc-card open" id="accEstCogs">
+              <div class="acc-header" onclick="toggleAcc('accEstCogs')" style="background:rgba(251,146,60,0.05);">
+                <div class="acc-left">
+                  <div class="acc-icon-wrap ic-cogs"></div>
+                  <div class="acc-titles">
+                    <div class="acc-title-main">আনুমানিত পণ্য বিক্রয় ব্যয়</div>
+                    <div class="acc-title-sub">Estimated COGS — Yard-Based Method</div>
+                  </div>
+                </div>
+                <div class="acc-right">
+                  <span class="acc-tag tag-cogs">ESTIMATED</span>
+                  <span class="acc-total tc-cogs" id="accEstCogsTotal">—</span>
+                  <span class="acc-chevron" style="transform:rotate(180deg);">▼</span>
+                </div>
+              </div>
+              <div class="acc-body" style="display:block;">
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-delta">×</span><span class="acc-row-label">বিক্রিত গজ (Units Sold)</span></div>
+                  <span class="acc-row-val v-neutral" id="auSoldGaj">—</span>
+                </div>
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-delta">÷</span><span class="acc-row-label">প্রতি গজে মুনাফা (Profit per Yard)</span></div>
+                  <span class="acc-row-val v-neutral" id="auProfitGaj">—</span>
+                </div>
+                <div class="acc-row">
+                  <div class="acc-row-left"><span class="acc-sign s-plus">→</span><span class="acc-row-label">আনুমানিক মোট মুনাফা (Estimated Gross Profit)</span></div>
+                  <span class="acc-row-val v-green" id="auEstProfit">—</span>
+                </div>
+                <div class="acc-row acc-total-row">
+                  <div class="acc-row-left"><span class="acc-row-label"><strong>আনুমানিত পণ্য বিক্রয় ব্যয় (Est. COGS)</strong></span></div>
+                  <span class="acc-row-val bold v-red" id="auEstCOGS">—</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actual COGS (Periodic Inventory) -->
+            <div class="acc-card" id="accActualCogs">
+              <div class="acc-header" onclick="toggleAcc('accActualCogs')">
+                <div class="acc-left">
+                  <div class="acc-icon-wrap ic-inv"></div>
+                  <div class="acc-titles">
+                    <div class="acc-title-main">প্রকৃত পণ্য বিক্রয় ব্যয়</div>
+                    <div class="acc-title-sub">Actual COGS — Periodic Inventory Method</div>
+                  </div>
+                </div>
+                <div class="acc-right">
+                  <span class="acc-tag tag-inv">ACTUAL</span>
+                  <span class="acc-total" style="font-family:var(--mono);font-size:14px;font-weight:800;color:#9d174d;" id="auActualCOGSHeader">—</span>
+                  <span class="acc-chevron">▼</span>
+                </div>
+              </div>
+              <div class="acc-body">
+                <div id="auActualContent">
+                  <div class="acc-row">
+                    <div class="acc-row-left"><span class="acc-sign s-plus">+</span><span class="acc-row-label">প্রারম্ভিক মজুদ মূল্য <em class="pl-sub-label">Opening Inventory Balance</em></span></div>
+                    <span class="acc-row-val v-neutral" id="auOpening">—</span>
+                  </div>
+                  <div class="acc-row">
+                    <div class="acc-row-left"><span class="acc-sign s-plus">+</span><span class="acc-row-label">মজুদ ক্রয় (অডিট কাল) <em class="pl-sub-label">Inventory Purchases</em></span></div>
+                    <span class="acc-row-val v-neutral" id="auPurchase">—</span>
+                  </div>
+                  <div class="acc-row">
+                    <div class="acc-row-left"><span class="acc-sign s-minus">−</span><span class="acc-row-label">সমাপনী মজুদ মূল্য <em class="pl-sub-label">Closing Inventory Balance</em></span></div>
+                    <span class="acc-row-val v-blue" id="auClosing">—</span>
+                  </div>
+                  <div class="acc-row acc-total-row">
+                    <div class="acc-row-left"><span class="acc-row-label"><strong>প্রকৃত পণ্য বিক্রয় ব্যয় (Actual COGS)</strong></span></div>
+                    <span class="acc-row-val bold v-red" id="auActualCOGS">—</span>
+                  </div>
+                  <!-- COGS Variance Analysis -->
+                  <div class="acc-analytics-box" style="margin:10px 14px 2px;">
+                    <div class="acc-analytics-title">পণ্য ব্যয় পার্থক্য বিশ্লেষণ — COGS Variance</div>
+                    <div class="acc-analytics-row"><span>প্রকৃত − আনুমানিত (Actual − Estimated)</span><span id="auVariance">—</span></div>
+                  </div>
+                  <div class="acc-variance-box ok" id="auVarianceBox" style="margin:6px 14px 4px;">
+                    <span class="acc-variance-label" id="auVarianceLabel">পার্থক্য</span>
+                    <span class="acc-variance-val" id="auVarianceVal">—</span>
+                  </div>
+                  <p class="acc-variance-note" id="auVarianceNote"></p>
+                </div>
+                <div id="auNoAudit" style="display:none;padding:16px;text-align:center;color:var(--text3);font-size:12px;line-height:1.6;">
+                  Stock অডিট ডেটা নেই<br><span style="font-size:11px;">Stock ধাপে প্রারম্ভিক মজুদ ও সমাপনী মজুদ পূরণ করুন</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Inventory Write-off -->
+            <div class="acc-card" id="accShrinkage">
+              <div class="acc-header" onclick="toggleAcc('accShrinkage')">
+                <div class="acc-left">
+                  <div class="acc-icon-wrap ic-cogs"></div>
+                  <div class="acc-titles">
+                    <div class="acc-title-main">মজুদ সংকোচন / ক্ষতিলোপ</div>
+                    <div class="acc-title-sub">Inventory Shrinkage / Write-off</div>
+                  </div>
+                </div>
+                <div class="acc-right">
+                  <span class="acc-tag tag-cogs">WRITE-OFF</span>
+                  <span class="acc-total tc-cogs" id="accShrinkageTotal">—</span>
+                  <span class="acc-chevron">▼</span>
+                </div>
+              </div>
+              <div class="acc-body">
+                <div class="acc-row" id="auLossRow">
+                  <div class="acc-row-left"><span class="acc-sign s-minus">−</span><span class="acc-row-label">নষ্ট মালের মূল্য (Damaged/Lost Stock)</span></div>
+                  <span class="acc-row-val v-amber" id="auStockLoss">—</span>
+                </div>
+                <div id="auNoLoss" style="display:none;padding:14px 16px;text-align:center;color:var(--text3);font-size:12px;">
+                  এই সপ্তাহে কোনো মজুদ সংকোচন নেই
+                </div>
+              </div>
+            </div>
+
+        </div><!-- /rcPanel4 -->
+
+        <!-- Save + Reset -->
+        <div id="saveWeekWrap" style="display:none; margin-bottom:8px; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button type="button" class="btn-save" onclick="saveToChart()">
+            <svg aria-hidden="true" focusable="false" class="card-title-icon icon-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" fill-rule="evenodd" d="M64 64h64v298.667H64zm106.667 149.333h64v149.334h-64zM448 170.667h-64v192h64zm-170.667-64h64v256h-64zM448 405.333H64V448h384z" clip-rule="evenodd" /></svg> গ্রাফে যোগ করুন
+          </button>
+        </div>
+
+      </div><!-- /result-content -->
+
+      <!-- Toast Notification -->
+      <div id="toastNotify" class="toast-notify">
+        <div class="toast-icon"></div>
+        <div class="toast-body">
+          <div class="toast-title" id="toastTitle">সফলভাবে সংরক্ষিত</div>
+          <div class="toast-sub" id="toastSub">গ্রাফে যোগ হয়েছে</div>
+        </div>
+      </div>
+
+    </div><!-- /page-result -->
+
+  </div><!-- /pages-container -->
+</div><!-- /app-shell -->
+
+<script src="js/weekly-report.js"></script>
+  </div><!-- /pk-body -->
+  </div><!-- /pk-drawer -->
+</div><!-- /paikkariOverlay -->
+
+<script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+<link rel="stylesheet" id="pkStyles" href="css/theme-cupcake.css">
+
+<script src="js/paikkari-drawer.js"></script>
+<script src="js/home-grid-layout.js"></script>
+
+<script src="js/pl-trends.js"></script>
+
+<script src="js/fabric-purchase.js"></script>
+<script src="js/profit-strip.js"></script>
+<script src="js/agg-report-card.js"></script>
+
+<script src="js/bangla-digit-converter.js"></script>
+</body>
+</html>
+
