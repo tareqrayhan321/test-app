@@ -23,7 +23,7 @@
   --radius-lg:   8px;
   --radius-xl:   9px;
   --radius-2xl:  10px;
-  --radius-3xl:  12px;
+  --radius-3xl:  18px;
   --radius-2xs:  5px;
   --radius-4xl:  14px;
   --radius-4xl-alt: 13px;
@@ -103,7 +103,7 @@
      theme-dark-wood.css (header background) and button-theme.css
      (primary button background) — consolidated here as the single
      source of truth. */
-  --gradient-header-teal: linear-gradient(135deg, #0d5c5f 0%, #0a4548 55%, #072e30 100%);
+  --gradient-header-teal: linear-gradient(135deg, #10716f 0%, #0b5a54 45%, #073c33 100%);
 
   /* ---- Repeated dark-wood accent tokens ----
      Each of these hex values appeared 2+ times verbatim across
