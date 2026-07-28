@@ -3,7 +3,7 @@
    PWA অফলাইন সাপোর্টের জন্য
 ══════════════════════════════════════════ */
 
-const CACHE_NAME = 'imran-cloth-store-v14';
+const CACHE_NAME = 'imran-cloth-store-v15';
 
 /* যেসব ফাইল ইনস্টলেশনের সময়ই ক্যাশ হবে */
 const PRECACHE_URLS = [
